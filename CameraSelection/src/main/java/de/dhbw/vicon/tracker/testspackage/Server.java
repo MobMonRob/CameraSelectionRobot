@@ -12,7 +12,8 @@ public class Server {
              ZMQ.Socket socket = context.socket(ZMQ.REP)) {
 
             // Bind the socket to a specific address and port
-            socket.bind("tcp://10.172.2.129:5555");
+            // socket.bind("tcp://10.172.2.129:5555");  // Andres IP
+            socket.bind("tcp://10.172.15.77:5555");  // Lab IP
 
             while (!Thread.currentThread().isInterrupted()) {
                 byte[] request = socket.recv(0); // Wait for a request from the client

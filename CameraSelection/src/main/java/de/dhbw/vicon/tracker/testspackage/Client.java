@@ -16,12 +16,13 @@ public class Client {
              ZMQ.Socket socket = context.socket(ZMQ.REQ)) {
 
             // Connect the socket to the server's address and port
-            socket.connect("tcp://10.172.2.129:5555");
+            // socket.connect("tcp://10.172.2.129:5555");  // Andres IP
+            socket.connect("tcp://10.172.15.77:5555");  // Lab IP
 
             // Send a request to the server
             String requestMsg = "Hello from Client";
             socket.send(requestMsg.getBytes(), 0);
-
+            
             // Wait for the response from the server
             byte[] response = socket.recv(0);
             System.out.println("Received response: " + new String(response));
