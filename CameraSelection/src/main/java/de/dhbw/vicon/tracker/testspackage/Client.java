@@ -16,7 +16,7 @@ public class Client {
              ZMQ.Socket socket = context.socket(ZMQ.REQ)) {
 
             // Connect the socket to the server's address and port
-            socket.connect("tcp://10.172.0.1:5555");
+            socket.connect("tcp://10.172.2.129:5555");
 
             // Send a request to the server
             String requestMsg = "Hello from Client";
