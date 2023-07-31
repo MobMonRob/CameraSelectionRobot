@@ -8,7 +8,7 @@ public class Tracker {
     
     public int getCameraCount(){
         // test
-        return 12;
+        return 13;
     }
     
     public void enableViconCamera(int index) throws IllegalArgumentException{}
