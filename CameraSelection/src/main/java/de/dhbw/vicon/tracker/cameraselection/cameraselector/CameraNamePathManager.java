@@ -4,11 +4,19 @@
  */
 package de.dhbw.vicon.tracker.cameraselection.cameraselector;
 
+import de.dhbw.vicon.tracker.cameraselection.ImagePathManager;  // Local library
+
 /**
  *
  * @author rahm-
  */
-public class CameraNamePathManager {
+
+
+/*
+This module gets the paths of the camera names images
+Extends from ImagePathManager for absolute path "calculating" services
+*/
+public class CameraNamePathManager extends ImagePathManager{
 
     private final int amountCameras;
     private final String[] pathsCameraName;
@@ -17,19 +25,21 @@ public class CameraNamePathManager {
     protected CameraNamePathManager(int amountCameras) {
         this.amountCameras = amountCameras;
         this.pathsCameraName = new String[amountCameras];
-        fillPathsCameraName();
+        fillPathsCameraName();  // Loads all the paths into the pathsCameraName array
     }
 
     /*
-    @dev: fills the path of all the cameras into the array, used in the constructor
+    @dev: fills the path of all the cameras into the array
+          called in the constructor
     @param: None
     @returns: void
     @author: Andres Masis
      */
     private void fillPathsCameraName() {
-        String basePath = "src/main/resources/Actions/CameraNames/";
+        // Goes one by one to fill the whole array
         for (int i = 0; i < amountCameras; i++) {
-            pathsCameraName[i] = basePath + "cameraName" + (i + 1) + ".PNG";
+            // The fisrt parameter of the function is the folder and the second the name of the file we want
+            pathsCameraName[i] =  getSpecificImagePath("CameraNames", "cameraName"+(i + 1));
         }
     }
 
