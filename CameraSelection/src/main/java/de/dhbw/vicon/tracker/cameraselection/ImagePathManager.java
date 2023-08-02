@@ -43,7 +43,7 @@ public abstract class ImagePathManager {
         String folderPath = basePath+"\\"+folder;
         
         // Adds the image name to the absolute path until the given folder
-        String imagePath = folderPath+"\\"+imageName+".PNG";  // Do not forget to add the .PNG extension
+        String imagePath = folderPath+"\\"+imageName+".png";  // Do not forget to add the .png extension
         
         // Returns the absolute path in this computer for the given image
         return imagePath;
