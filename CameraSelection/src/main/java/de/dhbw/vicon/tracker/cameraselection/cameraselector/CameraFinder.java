@@ -4,7 +4,6 @@
  */
 package de.dhbw.vicon.tracker.cameraselection.cameraselector;
 
-import de.dhbw.vicon.tracker.cameraselection.cameraselector.CameraNamePathManager;
 import de.dhbw.vicon.tracker.cameraselection.SikuliXManager;
 
 import java.util.Random;
@@ -15,15 +14,15 @@ import java.util.Random;
  */
 public class CameraFinder extends SikuliXManager {
 
-    private int amountCameras;
-    private CameraNamePathManager pathManager;  // To get the path of the camera name images
-    private float similarity;  // For SikuliX calibration
+    private final int amountCameras;
+    private final CameraNamePathManager pathManager;  // To get the path of the camera name images
+    private final float similarity;  // For SikuliX calibration
 
     // Constructor that receives the amount of camera by parameter
     public CameraFinder(int amountCameras) {
         this.amountCameras = amountCameras;
         this.pathManager = new CameraNamePathManager(amountCameras);
-        this.similarity = 0.9f;  //0.9 avoids getting trash, more than that moy not even recognize the camera
+        this.similarity = 0.95f;  //0.95 avoids getting trash, more than that moy not even recognize the camera
     }
     
     
@@ -72,7 +71,6 @@ public class CameraFinder extends SikuliXManager {
             if (randomCameraIndex == candidateIndex){
                 // It makes no sense of using the same number
                 i--;  // This iteration did not count
-                continue;  //  tries again
                 
             } else {
                 // Numbers are different
@@ -81,10 +79,9 @@ public class CameraFinder extends SikuliXManager {
                 if(isCameraOnScreen(randomCameraIndex)){
                     // It found another coincidence, this is a problem
                     return false;  // There is confusion, the original match is not correct
-                } else {
-                    // This comparison was ok
-                    continue;  // Goes to the next comparisons
-                }
+                } 
+                // This comparison was ok, goes to the next comparisons
+                
             }
         }  // Finishes comparisons
         
@@ -152,10 +149,8 @@ public class CameraFinder extends SikuliXManager {
                         return cameraIndex;  // Returns the correct camera index
                     }
                 
-                } else {
-                    // It did not coincide
-                    continue; // Goes to the next camera
                 }
+                // It did not coincide, Goes to the next camera
             }
             
             // A trial ended, goes to the next trial

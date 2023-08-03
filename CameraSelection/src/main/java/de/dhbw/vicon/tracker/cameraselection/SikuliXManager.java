@@ -14,7 +14,7 @@ import org.sikuli.script.Screen;
  */
 public class SikuliXManager {
 
-    private Screen screen;  // SikuliX screen
+    private final Screen screen;  // SikuliX screen
 
     public SikuliXManager() {
         this.screen = ScreenSingleton.getScreen();  // Gets the Singleton instance of the SikuliX screen
