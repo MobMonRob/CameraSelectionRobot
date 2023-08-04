@@ -5,7 +5,7 @@
 package de.dhbw.vicon.tracker.cameraselection;
 
 import org.sikuli.script.Pattern;
-import org.sikuli.script.Screen;
+import org.sikuli.script.Region;
 
 /**
  *
@@ -21,23 +21,12 @@ public class SikuliXManager {
               False if SikuliX could not found the given image in the screen
     @author: Andres Masis
      */
-    public boolean isImageOnScreen(String imagePath, float similarity) {
-        // Creates the SikuliX screen
-        Screen screen = new Screen();
-        
+    public boolean isImageOnScreen(String imagePath, float similarity, Region region) {
         // Calibrates similarity
-        Pattern imagePattern = new Pattern(imagePath);  // Converts the string to a pattern to adjust similarity
-        imagePattern.similar(similarity);  // Adjusts similarity
+        Pattern imagePattern = new Pattern(imagePath).similar(similarity);
 
-        // Tries to find the image on the screen
-        if (screen.exists(imagePattern) != null) {
-            // If exists() it means SikuliX found a coincidence
-            return true;  // The camera is on the screen
-            
-        } else {
-            // If exists() returns null, it means that it did not coincide
-            return false; // The camera was not on the screen
-        }
+        // Tries to find the image on the screen and return wether it is there or not
+        return region.exists(imagePattern) != null;
     }
 
 }

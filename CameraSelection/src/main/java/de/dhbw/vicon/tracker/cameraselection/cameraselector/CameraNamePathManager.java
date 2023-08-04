@@ -36,11 +36,11 @@ public class CameraNamePathManager extends ImagePathManager{
     @author: Andres Masis
      */
     private void fillPathsCameraName() {
-        // Goes one by one to fill the whole array
-        for (int i = 0; i < amountCameras; i++) {
+        // Use parallel stream to fill the array faster
+        java.util.stream.IntStream.range(0, amountCameras).parallel().forEach(i -> {
             // The fisrt parameter of the function is the folder and the second the name of the file we want
             pathsCameraName[i] =  getSpecificImagePath("CameraNames", "cameraName"+(i + 1));
-        }
+        });
     }
 
     /*
