@@ -13,7 +13,7 @@ public class JeroMQClientExample {
     public static void main(String[] args) {
         try (ZContext context = new ZContext()) {
             Socket client = context.createSocket(SocketType.REQ);
-            client.connect("tcp://localhost:5555");
+            client.connect("tcp://182.52.247.41:5555");
             System.out.println("Client started");
             for (int i = 0; i < 10; i++) {
                 int request = i;

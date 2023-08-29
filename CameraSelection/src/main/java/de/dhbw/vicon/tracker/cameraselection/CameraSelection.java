@@ -39,7 +39,7 @@ public class CameraSelection {
         // Connect to the server
         try (ZContext context = new ZContext()) {
             ZMQ.Socket client = context.createSocket(SocketType.REQ);
-            String remoteMachineAddress = "tcp://localhost:5555";  // Dr. Olver´s laptop in the lab address 
+            String remoteMachineAddress = "185.52.247.41:5555";  // Dr. Olver´s laptop in the lab address 
             client.connect(remoteMachineAddress);
 
             // Menu to interact with the user

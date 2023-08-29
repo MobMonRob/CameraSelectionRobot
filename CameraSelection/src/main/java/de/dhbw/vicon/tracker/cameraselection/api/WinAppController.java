@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Scanner;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -107,7 +108,7 @@ public class WinAppController {
         // Sets the capabilities needed for the driver
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("app", "Root");
-        
+
         // Starts the WinApp driver instance
         // URL is deprecated but must be used because it is the one supported by WindowsDriver
         winDriver = new WindowsDriver(new URL("http://127.0.0.1:4723"), capabilities);
@@ -130,6 +131,63 @@ public class WinAppController {
         WebElement element = winDriver.findElementByName("Vicon Tracker 3.10.0 x64");
         Actions action = new Actions(winDriver);
         action.doubleClick(element).perform();
+    }
+
+    /*
+    @dev: This method tells if the Vicon Tracker is connected or not
+          It looks for the CONNECTED label on screen
+    @param: none
+    @return: bool
+             True if CONNECTED
+             False if CONNECTED not founded
+    @author: Anddres Masis
+     */
+    protected boolean isConnected() {
+        try {
+            // Looks for the CONNECTED label on the screen
+            winDriver.findElementByName("CONNECETED");
+            return true;
+        } catch (NoSuchElementException e) {
+            // The element was not found
+            return false;
+        }
+    }
+
+    public boolean isAppRunning(String processName) {
+        boolean isRunning = false;
+        try {
+            Process process = Runtime.getRuntime().exec("tasklist");
+            Scanner scanner = new Scanner(process.getInputStream());
+
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if (line.contains(processName)) {
+                    isRunning = true;
+                    break;
+                }
+            }
+            scanner.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return isRunning;
+    }
+
+    public void closeApp(String processName) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder("taskkill", "/f", "/im", processName);
+            pb.inheritIO();
+            Process process = pb.start();
+            process.waitFor();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closePreviousInstances(String processName) {
+        if (isAppRunning(processName)) {
+            closeApp(processName);
+        }
     }
 
     /*
