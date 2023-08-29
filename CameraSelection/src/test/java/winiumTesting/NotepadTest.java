@@ -21,14 +21,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 public class NotepadTest {
 
     public static void main(String[] args) throws MalformedURLException, IOException, InterruptedException {
-        DesiredCapabilities appCapabilities = new DesiredCapabilities();
-        appCapabilities.setCapability("app", "Root");
-        
-        WindowsDriver desktopSession = new WindowsDriver(new URL("http://127.0.0.1:4723"), appCapabilities);
-        
-
-        // Use the session to control the desktop
-        desktopSession.getKeyboard().sendKeys(Keys.COMMAND + "a" + Keys.COMMAND);
-        desktopSession.findElementByName("Calculator - 1 running window").click();
+        new ProcessBuilder("taskkill", "/F", "/IM", "WinAppDriver.exe").start(); // Shuts down the WinApp server
     }
 }

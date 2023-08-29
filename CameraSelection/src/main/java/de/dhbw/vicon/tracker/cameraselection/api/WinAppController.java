@@ -69,7 +69,6 @@ public class WinAppController {
     private Robot robot;  // To controll the mouse
     private WindowsDriver winDriver;  // To interact with the GUI
 
-    
     // Constructor
     public WinAppController() throws AWTException, MalformedURLException, IOException, InterruptedException {
         cameraNames = new String[]{"#1 5 (Vero v2.2)",
@@ -90,36 +89,13 @@ public class WinAppController {
         openViconTracker();
     }
 
-    
-    
-    /*
-    @dev: This method opens the Vicon Tracker app 
-    @param: none
-    @return: void
-    @author: Anddres Masis
-    */
-    private void openViconTracker() {
-        // We go to the Desktop
-        robot.keyPress(KeyEvent.VK_WINDOWS);
-        robot.keyPress(KeyEvent.VK_D);
-        robot.keyRelease(KeyEvent.VK_D);
-        robot.keyRelease(KeyEvent.VK_WINDOWS);
-
-        // Clicks on the Vicon Shortcut
-        WebElement element = winDriver.findElementByName("Vicon Tracker 3.10.0 x64");
-        Actions action = new Actions(winDriver);
-        action.doubleClick(element).perform();
-    }
-
-    
-    
     /*
     @dev: This method starts the server, and puts the capabilities into the driver and starts the driver 
           Note that it throws an excpetion, so it also must be added when calling this method
     @param: none
     @return: void
     @author: Anddres Masis
-    */
+     */
     private void initializeWinAppDriver() throws MalformedURLException, IOException, InterruptedException {
         // Creates a desktop instance to open automatically some programs
         Desktop desktop = Desktop.getDesktop();
@@ -131,13 +107,31 @@ public class WinAppController {
         // Sets the capabilities needed for the driver
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("app", "Root");
+        
         // Starts the WinApp driver instance
-        // URL is deprecated but must be used because it is the one supported bz WindowsDriver
+        // URL is deprecated but must be used because it is the one supported by WindowsDriver
         winDriver = new WindowsDriver(new URL("http://127.0.0.1:4723"), capabilities);
     }
- 
-    
-    
+
+    /*
+    @dev: This method opens the Vicon Tracker app 
+    @param: none
+    @return: void
+    @author: Anddres Masis
+     */
+    private void openViconTracker() {
+        // We go to the Desktop with shortcut Win+D
+        robot.keyPress(KeyEvent.VK_WINDOWS);
+        robot.keyPress(KeyEvent.VK_D);
+        robot.keyRelease(KeyEvent.VK_D);
+        robot.keyRelease(KeyEvent.VK_WINDOWS);
+
+        // Clicks on the Vicon Shortcut
+        WebElement element = winDriver.findElementByName("Vicon Tracker 3.10.0 x64");
+        Actions action = new Actions(winDriver);
+        action.doubleClick(element).perform();
+    }
+
     /*
     @dev: This method closes all the app, making sure the running environments shuts down. 
           It shuts down the Vicon tracker, the WinApp driver and its server 
@@ -145,28 +139,24 @@ public class WinAppController {
     @param: none
     @return: void
     @author: Anddres Masis
-    */
+     */
     protected void endSession() throws IOException {
-        winDriver.findElementByName("Schließen");  // Closes the Vicon Tracker
-        winDriver.quit(); // Stops the WindApp driver     
+        winDriver.findElementByName("Schließen").click();  // Closes the Vicon Tracker
+        winDriver.quit(); // Stops the WinApp driver     
         new ProcessBuilder("taskkill", "/F", "/IM", "WinAppDriver.exe").start(); // Shuts down the WinApp server
     }
 
-    
-    
     /*
     @dev: This method makes sure that we are on the correct camera. It clicks on the screen the camera with the given index.
     @param: it receives by parameter the Index of the camera integral it should be between zero and 12 
     @return: it returns true in case the element was found successfully
              it returns false in case the element was not found
     @author: Anddres Masis
-    */
+     */
     protected void clickOnCamera(int cameraIndex) {
         winDriver.findElementByName(cameraNames[cameraIndex]).click();
     }
 
-    
-    
     /*
     @dev: This method clicks the enable/disable check box on the screen
     @param: it receives by parameter the specific name of the checkbox
@@ -174,7 +164,7 @@ public class WinAppController {
     @return: it returns true in case the element was found successfully
              it returns false in case the element was not found
     @author: Anddres Masis
-    */
+     */
     protected boolean clickCheckbox(String value) {
         // Get the path of the true/false checkbox to find it on screen
         String xPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QWidget\"]/Table[@ClassName=\"VParamListView\"]/DataItem[@Name=\"" + value + "\"]";

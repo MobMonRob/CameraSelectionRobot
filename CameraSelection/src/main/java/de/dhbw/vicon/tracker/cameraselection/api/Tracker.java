@@ -54,7 +54,7 @@ public class Tracker {
 
         // We look for true. Disable is from true to false. To disable it first must be enabled (true)
         if (winAppController.clickCheckbox("true")) {
-            return  "The camera was disabled succesfully";
+            return "The camera was disabled succesfully";
         } else {
             return "The camera is already disabled";
         }
@@ -71,6 +71,18 @@ public class Tracker {
         winAppController.endSession();
     }
 
+    /*
+    In this main method
+    It creates an instance of this class
+    This to run the constructor, there the WinAppController is automatically started also
+    Also allows to call the non static methods of this class
+    Then it creates the socket connection, this class acts as the server
+    After that it start a while true to keep this server listening for requests
+    If the server receives 0 as camera index it shuts down everything
+    If it receives another index it means it is the index of an existing camera
+    In that case it also needs to receive another value to know if it must enable or disable
+    When it has the valid index and the enable or disable value, perfroms the action
+     */
     public static void main(String[] args) throws AWTException, IOException, MalformedURLException, InterruptedException {
         Tracker t = new Tracker();  // Instance to run the constructor and access the non-static methods
 
@@ -79,55 +91,57 @@ public class Tracker {
             ZMQ.Socket server = context.createSocket(SocketType.REP);
             server.bind("tcp://localhost:5555");  // Localhost because this is the server
 
-            // While true to keep the server listening
+            // While(true) to keep the server listening
             while (true) {
-                // Gets the camera selection value from the client (this is the counterpart of lines 30 and 40 of CameraSelection.java)
-                byte[] cameraIndexData = server.recv();  // Receives the bytes
-                int cameraIndex = java.nio.ByteBuffer.wrap(cameraIndexData).getInt();  // Parse to int
+                // Gets the camera index from the client
+                // (counterpart to lines 66-67 or lines 97-98 of CameraSelection.java)
+                byte[] cameraIndexData = server.recv();
+                int cameraIndex = java.nio.ByteBuffer.wrap(cameraIndexData).getInt();
 
+                // Checks if it is either the close app value or an index to interact with a camera
                 if (cameraIndex == 0) {
-                    // 0 is to stop the app (this is the counterpart of lines 40-50 in CameraSelection.java)
-                    
-                    t.stopProgram(); // Stops the WinAppDriver session
-                    server.send("Server stopped".getBytes(ZMQ.CHARSET), 0);  // Informs the client
-                    break;  // Exits the loop
-                    
-                } else {
-                    // Must enable/disable a camera
-                    
-                    // Response to inform everything is good with the camera indexc (counterpart of line 57 of CameraSelection.java)
-                    byte[] reply1 = java.nio.ByteBuffer.allocate(4).putInt(1).array();  // 1 as reply to inform everything is good with the camera index
-                    server.send(reply1, 0);  // Sends the reply to the client
-                    
-                    // Gets the option value from the client (counterpart of lines 70 and 71 of CameraSelection.java)
-                    byte[] optionData = server.recv();  // Receives the bytes
-                    int option = java.nio.ByteBuffer.wrap(optionData).getInt();
-                    // Send a reply to the client (counterpart of lines 73 and 74 of CameraSelection.java)
-                    byte[] reply2 = java.nio.ByteBuffer.allocate(4).putInt(1).array(); // 1 as reply to inform everything is good
-                    server.send(reply2, 0); // Sends the reply to the client
-                    
-                    // Perform the enable/disable action
-                    String response = "";  // To store the response of the enable/disable action
-                    if(option == 0) {
-                        // 0 is to disable
-                        response = t.disableViconCamera(cameraIndex);  // Stores the response in the variable
-                    } else if(option == 1) {
-                        // 1 is to disable
-                        response = t.enableViconCamera(cameraIndex);  // Stores the response in the variable
-                    } else {
-                        // Any othef number from the client (invalid option)
-                        response = "Action not performed by invalid user input";
-                    }
+                    // Has to close the app
+                    t.stopProgram();
 
-                    // Sends the response to the client
+                    // Informs the client of the closing status (counterpart of lines 70-71 of CameraSelection.java)
+                    String response = "Server succesfully stopped";
                     server.send(response.getBytes(ZMQ.CHARSET), 0);
 
+                    // Leaves the loop to end the execution
+                    break;
+
+                } else {
+                    // Got an index of a camera to interact with
+
+                    // Tells the client the camera index was received (counterpart to line 101 of CameraSelection.java)
+                    boolean value1 = true;
+                    server.send(new byte[]{(byte) (value1 ? 1 : 0)}, 0);
+
+                    // Gets the option from the client (counterpart to lines 104-105 of CameraSelection.java)
+                    byte[] optionData = server.recv();
+                    int option = java.nio.ByteBuffer.wrap(optionData).getInt();
+
+                    // Tells the client the option was received (counterpart to line 108 of CameraSelection.java)
+                    boolean value2 = true;
+                    server.send(new byte[]{(byte) (value2 ? 1 : 0)}, 0);
+
+                    // Executes the enable/disable action
+                    cameraIndex--;  // Arrays are from 0 to n-1, human input comes from 1 to n
+                    String response;
+                    if (option == 0) {
+                        response = t.disableViconCamera(cameraIndex);
+                    } else {
+                        response = t.enableViconCamera(cameraIndex);
+                    }
+
+                    // Tells the client the output of enable/disable (counterpart of lines 111-112 of CameraSelection.java)
+                    server.send(response.getBytes(ZMQ.CHARSET), 0);
                 }
 
-                // Closing operations after exiting the server listening (while)
-                context.destroy();  // Closes the JeroMQ sockets context
-                System.exit(0);  // Stops the execution
             }
+
+            // Out of the loop (server is not listening anymore)
+            context.destroy();  // Closes the JeroMQ sockets context
         }
     }
 }
