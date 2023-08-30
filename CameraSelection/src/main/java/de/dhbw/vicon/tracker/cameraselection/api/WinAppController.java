@@ -10,15 +10,13 @@ import java.awt.Desktop;
 import java.awt.MouseInfo;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Scanner;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 /**
@@ -72,6 +70,16 @@ public class WinAppController {
 
     // Constructor
     public WinAppController() throws AWTException, MalformedURLException, IOException, InterruptedException {
+        // Vicon Tracker
+        closePreviousInstances("Tracker.exe");
+        openViconTracker();
+
+        // WinAppDriver
+        closePreviousInstances("WinAppDriver.exe");
+        initializeWinAppDriver();
+
+        robot = new Robot();
+
         cameraNames = new String[]{"#1 5 (Vero v2.2)",
             "#2 6 (Vero v2.2)",
             "#3 7 (Vero v2.2)",
@@ -85,9 +93,20 @@ public class WinAppController {
             "#11 4 (Vero v2.2)",
             "#12 13 (Vero v2.2)",
             "#13 12 (Vero v2.2)"};
-        robot = new Robot();
-        initializeWinAppDriver();
-        openViconTracker();
+    }
+
+    /*
+    @dev: This method opens the Vicon Tracker app 
+    @param: none
+    @return: void
+    @author: Anddres Masis
+     */
+    private void openViconTracker() throws IOException {
+        // Creates a desktop instance to open automatically some programs
+        Desktop desktop = Desktop.getDesktop();
+
+        // Starts the Vicon Tracker
+        desktop.open(new File("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Vicon\\Tracker 3.10.0\\Vicon Tracker 3.10.0 x64.lnk"));
     }
 
     /*
@@ -115,25 +134,6 @@ public class WinAppController {
     }
 
     /*
-    @dev: This method opens the Vicon Tracker app 
-    @param: none
-    @return: void
-    @author: Anddres Masis
-     */
-    private void openViconTracker() {
-        // We go to the Desktop with shortcut Win+D
-        robot.keyPress(KeyEvent.VK_WINDOWS);
-        robot.keyPress(KeyEvent.VK_D);
-        robot.keyRelease(KeyEvent.VK_D);
-        robot.keyRelease(KeyEvent.VK_WINDOWS);
-
-        // Clicks on the Vicon Shortcut
-        WebElement element = winDriver.findElementByName("Vicon Tracker 3.10.0 x64");
-        Actions action = new Actions(winDriver);
-        action.doubleClick(element).perform();
-    }
-
-    /*
     @dev: This method tells if the Vicon Tracker is connected or not
           It looks for the CONNECTED label on screen
     @param: none
@@ -153,27 +153,44 @@ public class WinAppController {
         }
     }
 
-    public boolean isAppRunning(String processName) {
-        boolean isRunning = false;
+    /*
+    @dev: This method tells if a given app is running in this machine
+    @param: processName (String)
+    @return: true if the process is running
+             false if the process is not running (was not found)
+    @author: Andres
+     */
+    private boolean isAppRunning(String processName) {
+        boolean isRunning = false;  // Flag variable that will be returned
         try {
-            Process process = Runtime.getRuntime().exec("tasklist");
-            Scanner scanner = new Scanner(process.getInputStream());
+            String line;
+            Process p = new ProcessBuilder("tasklist.exe").start();  // Gets the list of processes
+            BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
+            // Checks process by process to see if it coincides with the processName parameter
+            while ((line = input.readLine()) != null) {
                 if (line.contains(processName)) {
+                    // Found the process
                     isRunning = true;
                     break;
                 }
             }
-            scanner.close();
+            input.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return isRunning;
     }
 
-    public void closeApp(String processName) {
+    /*
+    @dev: This method closes a given app
+    @param: processName (String)
+    @return: void
+    @author: Andres
+     */
+    private void closeApp(String processName) {
         try {
             ProcessBuilder pb = new ProcessBuilder("taskkill", "/f", "/im", processName);
             pb.inheritIO();
@@ -184,24 +201,16 @@ public class WinAppController {
         }
     }
 
-    public void closePreviousInstances(String processName) {
+    /*
+    @dev: This method closes a given app in case it is running
+    @param: processName (String)
+    @return: void
+    @author: Andres
+     */
+    private void closePreviousInstances(String processName) {
         if (isAppRunning(processName)) {
             closeApp(processName);
         }
-    }
-
-    /*
-    @dev: This method closes all the app, making sure the running environments shuts down. 
-          It shuts down the Vicon tracker, the WinApp driver and its server 
-          Note that it throws an excpetion, so it also must be added when calling this method
-    @param: none
-    @return: void
-    @author: Anddres Masis
-     */
-    protected void endSession() throws IOException {
-        winDriver.findElementByName("Schließen").click();  // Closes the Vicon Tracker
-        winDriver.quit(); // Stops the WinApp driver     
-        new ProcessBuilder("taskkill", "/F", "/IM", "WinAppDriver.exe").start(); // Shuts down the WinApp server
     }
 
     /*
@@ -241,4 +250,57 @@ public class WinAppController {
         }
     }
 
+    /*
+    @dev: This method closes all the app, making sure the running environments shuts down. 
+          It shuts down the Vicon tracker, the WinApp driver and its server 
+          Note that it throws an excpetion, so it also must be added when calling this method
+    @param: none
+    @return: void
+    @author: Anddres Masis
+     */
+    protected void endSession() throws IOException {
+        closeApp("Tracker.exe");  // Closes the Vicon Tracker
+        winDriver.quit(); // Stops the WinApp driver     
+        closeApp("WinAppDriver.exe"); // Shuts down the WinApp server
+    }
+
+    /*
+    Auxiliary methods
+    This methods work properly, but are not the best approach
+    These depends on the mouse and GUI detection which are less reliable
+    Although these are less precise, it is recommended to not delete this code
+    They have proved to work and these can be useful as a backup
+    
+    @dev: This method opens the Vicon Tracker app 
+    @param: none
+    @return: void
+    @author: Anddres Masis
+    
+    private void openViconTracker() {
+        // We go to the Desktop with shortcut Win+D
+        robot.keyPress(KeyEvent.VK_WINDOWS);
+        robot.keyPress(KeyEvent.VK_D);
+        robot.keyRelease(KeyEvent.VK_D);
+        robot.keyRelease(KeyEvent.VK_WINDOWS);
+
+        // Clicks on the Vicon Shortcut
+        WebElement element = winDriver.findElementByName("Vicon Tracker 3.10.0 x64");
+        Actions action = new Actions(winDriver);
+        action.doubleClick(element).perform();
+    }
+
+    
+    @dev: This method closes all the app, making sure the running environments shuts down. 
+          It shuts down the Vicon tracker, the WinApp driver and its server 
+          Note that it throws an excpetion, so it also must be added when calling this method
+    @param: none
+    @return: void
+    @author: Anddres Masis
+    
+    protected void endSession() throws IOException {
+        winDriver.findElementByName("Schließen").click();  // Closes the Vicon Tracker
+        winDriver.quit(); // Stops the WinApp driver     
+        new ProcessBuilder("taskkill", "/F", "/IM", "WinAppDriver.exe").start(); // Shuts down the WinApp server
+    }
+     */
 }
