@@ -62,7 +62,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
  * To learn more about these tools, check this playlist:
  * https://www.youtube.com/playlist?list=PLnxpMuIcxn1TG2Eupfj_16mDRVtYipKYe
  */
-public class NotepadTest {
+public class NotepadTest{
 
     private String[] cameraNames;  // Hold the automation names of the cameras
     private Robot robot;  // To controll the mouse
@@ -225,8 +225,46 @@ public class NotepadTest {
         }
     }
 
-    public void arrangeCameraArea() {
+    /*
+    @dev: it puts the subarea that contains the a given element in the correct position
+          to make sure the element is visible
+          It achieves that by going to the given area and scrolling all the way to the top
+          Because the elements we are looking for, are usually at the top
+    @param: xPath (String), necessary to find the element on screen
+            amountScrolls (int), determines how many scrolls are necessary to reach the top
+    @returns: void
+    @author: Andres Masis
+     */
+    private void arrangeAreaByXPath(String xPath, int amountScrolls) throws InterruptedException {
+        // Clicks on the Properties label (closest element)
+        winDriver.findElementByXPath(xPath).click();
 
+        // Moves the mouse to the left and slightly down so it is on the correct subarea
+        robot.mouseMove(MouseInfo.getPointerInfo().getLocation().x - 175, MouseInfo.getPointerInfo().getLocation().y + 20);
+
+        // Clicks (press and release) to act on that subarea
+        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+
+        // Scrolls all the way up (negative to scroll up)
+        for (int i = 0; i < amountScrolls; i++) {
+            robot.mouseWheel(-4);  // No more than 4, if you put more, it may get stuck
+            Thread.sleep(300);  // Necessary delay to give chance for Vicon Tracker to react
+        }
+    }
+
+    /*
+    @dev: it puts the subarea that contains the checkbox in the correct position
+          to make sure the checkbox is visible
+          Relies on the method arrangeAreaByXPath()
+    @param: None
+    @returns: void
+    @author: Andres Masis
+     */
+    private void arrangeCameraArea() throws InterruptedException {
+        // Clicks on the Properties label (closest element)
+        String xPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VParamListHeader\"]";
+        arrangeAreaByXPath(xPath, 4);
     }
 
     /*
@@ -243,9 +281,7 @@ public class NotepadTest {
     /*
     @dev: it puts the subarea that contains the checkbox in the correct position
           to make sure the checkbox is visible
-          It achieves that by pressing the up arrow of the that subarea several times
-          To go to the top of it
-          Because the checkbox we are looking for is at the top
+          Relies on the method arrangeAreaByXPath()
     @param: None
     @returns: void
     @author: Andres Masis
@@ -253,20 +289,7 @@ public class NotepadTest {
     private void arrangeCheckboxArea() throws InterruptedException {
         // Clicks on the Properties label (closest element)
         String xPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VParamListHeader\"]";
-        winDriver.findElementByXPath(xPath).click();
-        
-        // Moves the mouse to the left and slightly down so it is on the correct subarea
-        robot.mouseMove(MouseInfo.getPointerInfo().getLocation().x - 175, MouseInfo.getPointerInfo().getLocation().y + 20);
-        
-        // Clicks (press and release) to act on that subarea
-        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-
-        // Scrolls all the way up (negative to scroll up)
-        for (int i = 0; i < 3; i++) {
-            robot.mouseWheel(-4);  // No more than 4, if you put more, it may get stuck
-            Thread.sleep(300);  // Necessary delay to give chance for Vicon Tracker to react
-        }
+        arrangeAreaByXPath(xPath, 3);
     }
 
     /*

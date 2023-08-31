@@ -65,7 +65,7 @@ public class Tracker {
           Note that it throws an excpetion, so it also must be added when calling this method
     @param: index of the desired camera (integer between 0 and 12)
     @return: None
-    @author: Anddres Masis
+    @author: Andres Masis
      */
     private void stopProgram() throws IOException {
         winAppController.endSession();

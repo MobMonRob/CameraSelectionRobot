@@ -226,22 +226,69 @@ public class WinAppController {
     }
 
     /*
-    @dev: This method makes sure that we are on the correct camera. It clicks on the screen the camera with the given index.
-    @param: it receives by parameter the Index of the camera integral it should be between zero and 12 
-    @return: it returns true in case the element was found successfully
-             it returns false in case the element was not found
-    @author: Anddres Masis
+    @dev: it puts the subarea that contains the a given element in the correct position
+          to make sure the element is visible
+          It achieves that by going to the given area and scrolling all the way to the top
+          Because the elements we are looking for, are usually at the top
+    @param: xPath (String), necessary to find the element on screen
+    @returns: void
+    @author: Andres Masis
      */
-    protected void clickOnCamera(int cameraIndex) {
-        winDriver.findElementByName(cameraNames[cameraIndex]).click();
+    private void arrangeAreaByXPath(String xPath) throws InterruptedException {
+        // Clicks on the Properties label (closest element)
+        winDriver.findElementByXPath(xPath).click();
+
+        // Moves the mouse based on the given offset so it is on the correct subarea
+        robot.mouseMove(MouseInfo.getPointerInfo().getLocation().x - 175, MouseInfo.getPointerInfo().getLocation().y + 20);
+
+        // Scrolls all the way up (negative to scroll up)
+        for (int i = 0; i < 4; i++) {
+            robot.mouseWheel(-4);  // No more than 4, if you put more, it may get stuck
+            Thread.sleep(300);  // Necessary delay to give chance for Vicon Tracker to react
+        }
     }
 
     /*
     @dev: it puts the subarea that contains the checkbox in the correct position
           to make sure the checkbox is visible
-          It achieves that by pressing the up arrow of the that subarea several times
-          To go to the top of it
-          Because the checkbox we are looking for is at the top
+          Relies on the method arrangeAreaByXPath()
+    @param: None
+    @returns: void
+    @author: Andres Masis
+     */
+    private void arrangeCameraArea() throws InterruptedException {
+        // Clicks on the Properties label (closest element)
+        String xPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Custom[@ClassName=\"QStackedWidget\"]/Group[@ClassName=\"VDataBrowserSystem\"]/Group[@ClassName=\"VConfigurationWidget\"]/Button[@ClassName=\"QToolButton\"]";
+        arrangeAreaByXPath(xPath);
+    }
+
+    /*
+    @dev: This method makes sure that we are on the correct camera. It clicks on the screen the camera with the given index.
+    @param: it receives by parameter the Index of the camera integral it should be between zero and 12 
+    @return: void
+    @author: Anddres Masis
+     */
+    protected void clickOnCamera(int cameraIndex) throws InterruptedException {
+        // Makes sure everything is in the correct position on the screen
+        arrangeCameraArea();
+
+        // Looks for the camera on screen
+        try {
+            winDriver.findElementByName(cameraNames[cameraIndex]).click();
+        } catch (NoSuchElementException e) {
+            // The camera was not visible, must scroll down a little bit
+            robot.mouseWheel(2);  // No more than 4, if you put more, it may get stuck
+            Thread.sleep(300);  // Necessary delay to give chance for Vicon Tracker to react
+            
+            // Searches the camera again
+            winDriver.findElementByName(cameraNames[cameraIndex]).click();
+        }
+    }
+
+    /*
+    @dev: it puts the subarea that contains the checkbox in the correct position
+          to make sure the checkbox is visible
+          Relies on the method arrangeAreaByXPath()
     @param: None
     @returns: void
     @author: Andres Masis
@@ -249,20 +296,7 @@ public class WinAppController {
     private void arrangeCheckboxArea() throws InterruptedException {
         // Clicks on the Properties label (closest element)
         String xPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VParamListHeader\"]";
-        winDriver.findElementByXPath(xPath).click();
-        
-        // Moves the mouse to the left and slightly down so it is on the correct subarea
-        robot.mouseMove(MouseInfo.getPointerInfo().getLocation().x - 175, MouseInfo.getPointerInfo().getLocation().y + 20);
-        
-        // Clicks (press and release) to act on that subarea
-        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-
-        // Scrolls all the way up (negative to scroll up)
-        for (int i = 0; i < 3; i++) {
-            robot.mouseWheel(-4);  // No more than 4, if you put more, it may get stuck
-            Thread.sleep(300);  // Necessary delay to give chance for Vicon Tracker to react
-        }
+        arrangeAreaByXPath(xPath);
     }
 
     /*
@@ -276,7 +310,7 @@ public class WinAppController {
     protected boolean clickCheckbox(String value) throws InterruptedException {
         // Makes sure everything is in the correct position on the screen
         arrangeCheckboxArea();
-        
+
         // Get the path of the true/false checkbox to find it on screen
         String xPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QWidget\"]/Table[@ClassName=\"VParamListView\"]/DataItem[@Name=\"" + value + "\"]";
 
