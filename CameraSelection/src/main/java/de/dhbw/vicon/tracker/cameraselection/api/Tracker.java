@@ -31,7 +31,7 @@ public class Tracker {
     @return: Message telling either the camera was enabled successfully or it was already enabled from before
     @author: Anddres Masis
      */
-    private String enableViconCamera(int index) throws IllegalArgumentException {
+    private String enableViconCamera(int index) throws IllegalArgumentException, InterruptedException {
         winAppController.clickOnCamera(index);  // Selects the camera
 
         // We look for false. Enable is from false to true. To enable it first must be disabled (false)
@@ -49,7 +49,7 @@ public class Tracker {
     @return: Message telling either the camera was disabled successfully or it was already disabled from before
     @author: Anddres Masis
      */
-    private String disableViconCamera(int index) throws IllegalArgumentException {
+    private String disableViconCamera(int index) throws IllegalArgumentException, InterruptedException {
         winAppController.clickOnCamera(index);  // Selects the camera
 
         // We look for true. Disable is from true to false. To disable it first must be enabled (true)

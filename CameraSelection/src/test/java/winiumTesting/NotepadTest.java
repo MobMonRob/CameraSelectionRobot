@@ -4,28 +4,19 @@
  */
 package winiumTesting;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
 import io.appium.java_client.windows.WindowsDriver;
 import java.awt.AWTException;
 import java.awt.Desktop;
 import java.awt.MouseInfo;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Scanner;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 /**
@@ -79,6 +70,8 @@ public class NotepadTest {
 
     // Constructor
     public NotepadTest() throws AWTException, MalformedURLException, IOException, InterruptedException {
+        openApps();
+        robot = new Robot();
         cameraNames = new String[]{"#1 5 (Vero v2.2)",
             "#2 6 (Vero v2.2)",
             "#3 7 (Vero v2.2)",
@@ -92,9 +85,40 @@ public class NotepadTest {
             "#11 4 (Vero v2.2)",
             "#12 13 (Vero v2.2)",
             "#13 12 (Vero v2.2)"};
-        robot = new Robot();
+    }
+
+    /*
+    @dev: This method opens the apps (WinAppDriver server and Vicon Tracker so far)
+          It is recommended to closePrevious instances of the same app, before starting it to avoid interferences 
+          Always make sure to start Vicon at the last
+          To avoid any other third-party GUI to be in front and interfere 
+    @param: none
+    @return: void
+    @author: Anddres Masis
+     */
+    private void openApps() throws IOException, MalformedURLException, InterruptedException {
+        // WinAppDriver
+        closePreviousInstances("WinAppDriver.exe");
         initializeWinAppDriver();
-        // openViconTracker();
+
+        // Vicon Tracker
+        // from the external programs, Vicon Tracker should always be started last to make sure its GUI will be in front with no interferences
+        closePreviousInstances("Tracker.exe");
+        openViconTracker();
+    }
+
+    /*
+    @dev: This method opens the Vicon Tracker app 
+    @param: none
+    @return: void
+    @author: Anddres Masis
+     */
+    private void openViconTracker() throws IOException {
+        // Creates a desktop instance to open automatically some programs
+        Desktop desktop = Desktop.getDesktop();
+
+        // Starts the Vicon Tracker
+        desktop.open(new File("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Vicon\\Tracker 3.10.0\\Vicon Tracker 3.10.0 x64.lnk"));
     }
 
     /*
@@ -122,39 +146,12 @@ public class NotepadTest {
     }
 
     /*
-    @dev: This method opens the Vicon Tracker app 
-    @param: none
-    @return: void
-    @author: Anddres Masis
-     */
-    private void openViconTracker() {
-        // We go to the Desktop with shortcut Win+D
-        robot.keyPress(KeyEvent.VK_WINDOWS);
-        robot.keyPress(KeyEvent.VK_D);
-        robot.keyRelease(KeyEvent.VK_D);
-        robot.keyRelease(KeyEvent.VK_WINDOWS);
-
-        // Clicks on the Vicon Shortcut
-        WebElement element = winDriver.findElementByName("Vicon Tracker 3.10.0 x64");
-        Actions action = new Actions(winDriver);
-        action.doubleClick(element).perform();
-    }
-    
-     public void openTracker2() throws IOException {
-        // Creates a desktop instance to open automatically some programs
-        Desktop desktop = Desktop.getDesktop();
-
-        // Starts the driver server
-        desktop.open(new File("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Vicon\\Tracker 3.10.0\\Vicon Tracker 3.10.0 x64.lnk"));
-    }
-
-    /*
     @dev: This method tells if the Vicon Tracker is connected or not
           It looks for the CONNECTED label on screen
     @param: none
     @return: bool
              True if CONNECTED
-             False if CONNECTED was not founded
+             False if CONNECTED not founded
     @author: Anddres Masis
      */
     protected boolean isConnected() {
@@ -168,26 +165,44 @@ public class NotepadTest {
         }
     }
 
-    public boolean isAppRunning(String processName) {
-         boolean isRunning = false;
+    /*
+    @dev: This method tells if a given app is running in this machine
+    @param: processName (String)
+    @return: true if the process is running
+             false if the process is not running (was not found)
+    @author: Andres
+     */
+    private boolean isAppRunning(String processName) {
+        boolean isRunning = false;  // Flag variable that will be returned
         try {
             String line;
-            Process p = new ProcessBuilder("tasklist.exe").start();
+            Process p = new ProcessBuilder("tasklist.exe").start();  // Gets the list of processes
             BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            // Checks process by process to see if it coincides with the processName parameter
             while ((line = input.readLine()) != null) {
                 if (line.contains(processName)) {
+                    // Found the process
                     isRunning = true;
                     break;
                 }
             }
             input.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return isRunning;
     }
 
-    public void closeApp(String processName) {
+    /*
+    @dev: This method closes a given app
+    @param: processName (String)
+    @return: void
+    @author: Andres
+     */
+    private void closeApp(String processName) {
         try {
             ProcessBuilder pb = new ProcessBuilder("taskkill", "/f", "/im", processName);
             pb.inheritIO();
@@ -198,24 +213,20 @@ public class NotepadTest {
         }
     }
 
-    public void closePreviousInstances(String processName) {
+    /*
+    @dev: This method closes a given app in case it is running
+    @param: processName (String)
+    @return: void
+    @author: Andres
+     */
+    private void closePreviousInstances(String processName) {
         if (isAppRunning(processName)) {
             closeApp(processName);
         }
     }
 
-    /*
-    @dev: This method closes all the app, making sure the running environments shuts down. 
-          It shuts down the Vicon tracker, the WinApp driver and its server 
-          Note that it throws an excpetion, so it also must be added when calling this method
-    @param: none
-    @return: void
-    @author: Anddres Masis
-     */
-    protected void endSession() throws IOException {
-        winDriver.findElementByName("Schließen").click();  // Closes the Vicon Tracker
-        winDriver.quit(); // Stops the WinApp driver     
-        new ProcessBuilder("taskkill", "/F", "/IM", "WinAppDriver.exe").start(); // Shuts down the WinApp server
+    public void arrangeCameraArea() {
+
     }
 
     /*
@@ -230,6 +241,35 @@ public class NotepadTest {
     }
 
     /*
+    @dev: it puts the subarea that contains the checkbox in the correct position
+          to make sure the checkbox is visible
+          It achieves that by pressing the up arrow of the that subarea several times
+          To go to the top of it
+          Because the checkbox we are looking for is at the top
+    @param: None
+    @returns: void
+    @author: Andres Masis
+     */
+    private void arrangeCheckboxArea() throws InterruptedException {
+        // Clicks on the Properties label (closest element)
+        String xPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VParamListHeader\"]";
+        winDriver.findElementByXPath(xPath).click();
+        
+        // Moves the mouse to the left and slightly down so it is on the correct subarea
+        robot.mouseMove(MouseInfo.getPointerInfo().getLocation().x - 175, MouseInfo.getPointerInfo().getLocation().y + 20);
+        
+        // Clicks (press and release) to act on that subarea
+        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+
+        // Scrolls all the way up (negative to scroll up)
+        for (int i = 0; i < 3; i++) {
+            robot.mouseWheel(-4);  // No more than 4, if you put more, it may get stuck
+            Thread.sleep(300);  // Necessary delay to give chance for Vicon Tracker to react
+        }
+    }
+
+    /*
     @dev: This method clicks the enable/disable check box on the screen
     @param: it receives by parameter the specific name of the checkbox
             it should be a string of true or false (note there is no uppercase)
@@ -237,17 +277,26 @@ public class NotepadTest {
              it returns false in case the element was not found
     @author: Anddres Masis
      */
-    protected boolean clickCheckbox(String value) {
+    protected boolean clickCheckbox(String value) throws InterruptedException {
+        // Makes sure everything is in the correct position on the screen
+        arrangeCheckboxArea();
+
         // Get the path of the true/false checkbox to find it on screen
         String xPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QWidget\"]/Table[@ClassName=\"VParamListView\"]/DataItem[@Name=\"" + value + "\"]";
 
         // It looks for the element on the screen
         try {
             winDriver.findElementByXPath(xPath).click();  // Goes to the element
-            robot.mouseMove(MouseInfo.getPointerInfo().getLocation().x - 85, MouseInfo.getPointerInfo().getLocation().y - 4);  // Adjust the mouse location to the actual checkbox
+            // Adjust the mouse location to the actual checkbox
+            robot.mouseMove(MouseInfo.getPointerInfo().getLocation().x - 85, MouseInfo.getPointerInfo().getLocation().y - 4);
             // Clicks on the checkbox
             robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
             robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+
+            // Moves the mouse a small offset just that it is not anymore over the checkbox to avoid enable/disable it by an accidental click
+            robot.mouseMove(MouseInfo.getPointerInfo().getLocation().x - 5, MouseInfo.getPointerInfo().getLocation().y - 5);
+
+            // Informs the action was completed successfully
             return true;
         } catch (NoSuchElementException e) {
             // The element was not found
@@ -255,4 +304,57 @@ public class NotepadTest {
         }
     }
 
+    /*
+    @dev: This method closes all the app, making sure the running environments shuts down. 
+          It shuts down the Vicon tracker, the WinApp driver and its server 
+          Note that it throws an excpetion, so it also must be added when calling this method
+    @param: none
+    @return: void
+    @author: Anddres Masis
+     */
+    protected void endSession() throws IOException {
+        closeApp("Tracker.exe");  // Closes the Vicon Tracker
+        winDriver.quit(); // Stops the WinApp driver     
+        closeApp("WinAppDriver.exe"); // Shuts down the WinApp server
+    }
+
+    /*
+    Auxiliary methods
+    This methods work properly, but are not the best approach
+    These depends on the mouse and GUI detection which are less reliable
+    Although these are less precise, it is recommended to not delete this code
+    They have proved to work and these can be useful as a backup
+    
+    @dev: This method opens the Vicon Tracker app 
+    @param: none
+    @return: void
+    @author: Anddres Masis
+    
+    private void openViconTracker() {
+        // We go to the Desktop with shortcut Win+D
+        robot.keyPress(KeyEvent.VK_WINDOWS);
+        robot.keyPress(KeyEvent.VK_D);
+        robot.keyRelease(KeyEvent.VK_D);
+        robot.keyRelease(KeyEvent.VK_WINDOWS);
+
+        // Clicks on the Vicon Shortcut
+        WebElement element = winDriver.findElementByName("Vicon Tracker 3.10.0 x64");
+        Actions action = new Actions(winDriver);
+        action.doubleClick(element).perform();
+    }
+
+    
+    @dev: This method closes all the app, making sure the running environments shuts down. 
+          It shuts down the Vicon tracker, the WinApp driver and its server 
+          Note that it throws an excpetion, so it also must be added when calling this method
+    @param: none
+    @return: void
+    @author: Anddres Masis
+    
+    protected void endSession() throws IOException {
+        winDriver.findElementByName("Schließen").click();  // Closes the Vicon Tracker
+        winDriver.quit(); // Stops the WinApp driver     
+        new ProcessBuilder("taskkill", "/F", "/IM", "WinAppDriver.exe").start(); // Shuts down the WinApp server
+    }
+     */
 }

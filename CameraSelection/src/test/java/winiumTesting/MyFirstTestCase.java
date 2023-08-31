@@ -20,9 +20,8 @@ public class MyFirstTestCase {
 
     public static void main(String[] args) throws AWTException, IOException, MalformedURLException, InterruptedException {
         NotepadTest n = new NotepadTest();
-        System.out.println(n.isAppRunning("netbeans64"));
-        // Tracker.exe
-        // WinAppDriver.exe
+        Thread.sleep(10000);
+        n.clickOnCamera(3);
     }
 
 }
