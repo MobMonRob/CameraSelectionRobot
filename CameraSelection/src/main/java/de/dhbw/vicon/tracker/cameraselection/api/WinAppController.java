@@ -134,7 +134,7 @@ public class WinAppController {
 
         // Starts the driver server
         desktop.open(new File("C:\\Program Files (x86)\\Windows Application Driver\\WinAppDriver.exe"));
-        Thread.sleep(1000);  // Gives some time for the server to start
+        Thread.sleep(800);  // Gives some time for the server to start
 
         // Sets the capabilities needed for the driver
         DesiredCapabilities capabilities = new DesiredCapabilities();

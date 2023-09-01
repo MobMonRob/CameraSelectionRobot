@@ -2,7 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package winiumTesting;
+package appCopy;
+
+/**
+ *
+ * @author rahm-
+ */
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+
 
 import io.appium.java_client.windows.WindowsDriver;
 import java.awt.AWTException;
@@ -62,14 +72,14 @@ import org.openqa.selenium.remote.DesiredCapabilities;
  * To learn more about these tools, check this playlist:
  * https://www.youtube.com/playlist?list=PLnxpMuIcxn1TG2Eupfj_16mDRVtYipKYe
  */
-public class NotepadTest{
+public class WinAppCopy {
 
     private String[] cameraNames;  // Hold the automation names of the cameras
     private Robot robot;  // To controll the mouse
     private WindowsDriver winDriver;  // To interact with the GUI
 
     // Constructor
-    public NotepadTest() throws AWTException, MalformedURLException, IOException, InterruptedException {
+    public WinAppCopy () throws AWTException, MalformedURLException, IOException, InterruptedException {
         openApps();
         robot = new Robot();
         cameraNames = new String[]{"#1 5 (Vero v2.2)",
@@ -134,7 +144,7 @@ public class NotepadTest{
 
         // Starts the driver server
         desktop.open(new File("C:\\Program Files (x86)\\Windows Application Driver\\WinAppDriver.exe"));
-        Thread.sleep(1000);  // Gives some time for the server to start
+        Thread.sleep(800);  // Gives some time for the server to start
 
         // Sets the capabilities needed for the driver
         DesiredCapabilities capabilities = new DesiredCapabilities();
@@ -231,23 +241,18 @@ public class NotepadTest{
           It achieves that by going to the given area and scrolling all the way to the top
           Because the elements we are looking for, are usually at the top
     @param: xPath (String), necessary to find the element on screen
-            amountScrolls (int), determines how many scrolls are necessary to reach the top
     @returns: void
     @author: Andres Masis
      */
-    private void arrangeAreaByXPath(String xPath, int amountScrolls) throws InterruptedException {
+    private void arrangeAreaByXPath(String xPath) throws InterruptedException {
         // Clicks on the Properties label (closest element)
         winDriver.findElementByXPath(xPath).click();
 
-        // Moves the mouse to the left and slightly down so it is on the correct subarea
+        // Moves the mouse based on the given offset so it is on the correct subarea
         robot.mouseMove(MouseInfo.getPointerInfo().getLocation().x - 175, MouseInfo.getPointerInfo().getLocation().y + 20);
 
-        // Clicks (press and release) to act on that subarea
-        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-
         // Scrolls all the way up (negative to scroll up)
-        for (int i = 0; i < amountScrolls; i++) {
+        for (int i = 0; i < 4; i++) {
             robot.mouseWheel(-4);  // No more than 4, if you put more, it may get stuck
             Thread.sleep(300);  // Necessary delay to give chance for Vicon Tracker to react
         }
@@ -263,19 +268,31 @@ public class NotepadTest{
      */
     private void arrangeCameraArea() throws InterruptedException {
         // Clicks on the Properties label (closest element)
-        String xPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VParamListHeader\"]";
-        arrangeAreaByXPath(xPath, 4);
+        String xPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Custom[@ClassName=\"QStackedWidget\"]/Group[@ClassName=\"VDataBrowserSystem\"]/Group[@ClassName=\"VConfigurationWidget\"]/Button[@ClassName=\"QToolButton\"]";
+        arrangeAreaByXPath(xPath);
     }
 
     /*
     @dev: This method makes sure that we are on the correct camera. It clicks on the screen the camera with the given index.
     @param: it receives by parameter the Index of the camera integral it should be between zero and 12 
-    @return: it returns true in case the element was found successfully
-             it returns false in case the element was not found
+    @return: void
     @author: Anddres Masis
      */
-    protected void clickOnCamera(int cameraIndex) {
-        winDriver.findElementByName(cameraNames[cameraIndex]).click();
+    protected void clickOnCamera(int cameraIndex) throws InterruptedException {
+        // Makes sure everything is in the correct position on the screen
+        arrangeCameraArea();
+
+        // Looks for the camera on screen
+        try {
+            winDriver.findElementByName(cameraNames[cameraIndex]).click();
+        } catch (NoSuchElementException e) {
+            // The camera was not visible, must scroll down a little bit
+            robot.mouseWheel(2);  // No more than 4, if you put more, it may get stuck
+            Thread.sleep(300);  // Necessary delay to give chance for Vicon Tracker to react
+            
+            // Searches the camera again
+            winDriver.findElementByName(cameraNames[cameraIndex]).click();
+        }
     }
 
     /*
@@ -289,7 +306,7 @@ public class NotepadTest{
     private void arrangeCheckboxArea() throws InterruptedException {
         // Clicks on the Properties label (closest element)
         String xPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VParamListHeader\"]";
-        arrangeAreaByXPath(xPath, 3);
+        arrangeAreaByXPath(xPath);
     }
 
     /*
