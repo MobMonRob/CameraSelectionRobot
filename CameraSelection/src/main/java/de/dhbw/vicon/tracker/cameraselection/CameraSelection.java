@@ -36,6 +36,9 @@ public class CameraSelection {
         // To read user´s input
         Scanner scanner = new Scanner(System.in);
 
+        System.out.println("Before running to this program, make sure that the API in the server is already running\n"
+                + "It is highly recommended to run this program at least 30 seconds after the server API is started to give time of the GUI Tracker to load everything \n"
+                + "If the previous conditions are not met, it is recommended to close this program and start it again when the server API is running and the Vicon Tracker has loaded prperly\n");
         // Connect to the server
         try (ZContext context = new ZContext()) {
             ZMQ.Socket client = context.createSocket(SocketType.REQ);

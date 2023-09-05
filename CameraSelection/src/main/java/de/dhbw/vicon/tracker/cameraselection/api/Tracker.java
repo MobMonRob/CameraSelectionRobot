@@ -104,7 +104,7 @@ public class Tracker {
      */
     public static void main(String[] args) throws AWTException, IOException, MalformedURLException, InterruptedException {
         Tracker t = new Tracker();  // Instance to run the constructor and access the non-static methods
-
+        Thread.sleep(30000);  // Gives 30 seconds for the Vicon Tracker to load everything on GUI.
         // Creates the sockets
         try (ZContext context = new ZContext()) {
             ZMQ.Socket server = context.createSocket(SocketType.REP);
