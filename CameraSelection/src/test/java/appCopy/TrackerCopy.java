@@ -4,10 +4,6 @@
  */
 package appCopy;
 
-/**
- *
- * @author rahm-
- */
 
 import java.awt.AWTException;
 import java.io.IOException;
@@ -15,7 +11,6 @@ import java.net.MalformedURLException;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
-
 
 /**
  *
@@ -30,7 +25,7 @@ public class TrackerCopy {
     WinAppCopy winAppController;
 
     // Constructor
-    private TrackerCopy() throws AWTException, IOException, MalformedURLException, InterruptedException {
+    private TrackerCopy () throws AWTException, IOException, MalformedURLException, InterruptedException {
         winAppController = new WinAppCopy();
     }
 
@@ -95,10 +90,8 @@ public class TrackerCopy {
      */
     public static void main(String[] args) throws AWTException, IOException, MalformedURLException, InterruptedException {
         TrackerCopy t = new TrackerCopy();  // Instance to run the constructor and access the non-static methods
-        Thread.sleep(10000);
-        long start = System.nanoTime();
-        t.enableViconCamera(3);
-        long elapsed = System.nanoTime()-start;
-        System.out.println(elapsed);
+        t.disableViconCamera(11);
+        Thread.sleep(5000);
+        t.disableViconCamera(11);
     }
 }

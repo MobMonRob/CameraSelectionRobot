@@ -36,9 +36,9 @@ public class Tracker {
 
         // We look for false. Enable is from false to true. To enable it first must be disabled (false)
         if (winAppController.clickCheckbox("false")) {
-            return "The camera was enabled succesfully";
+            return "\nThe camera was enabled succesfully";
         } else {
-            return "The camera is already enabled";
+            return "\nAn error occured. Check that the Vicon Tracker GUI is running on full screen and no other programs on the screnn on the server machine";
         }
     }
 
@@ -54,11 +54,30 @@ public class Tracker {
 
         // We look for true. Disable is from true to false. To disable it first must be enabled (true)
         if (winAppController.clickCheckbox("true")) {
-            return "The camera was disabled succesfully";
+            return "\nThe camera was disabled succesfully";
         } else {
-            return "The camera is already disabled";
+            return "\nAn error occured. Check that the Vicon Tracker GUI is running on full screen and no other programs on the screnn on the server machine";
         }
     }
+
+    private String getDisabledCameras() throws InterruptedException {
+        // Element to store the result to return
+        StringBuilder response = new StringBuilder();
+
+        // Gets the states of the cameras
+        boolean[] disabledArray = winAppController.getDisabledCameras();
+        // Forms a string to make it more readable
+        for (int i = 0; i < 13; i++) {
+            response.append("Camera ").append(Integer.toString(i + 1)).append(" is ");
+            if (disabledArray[i]) {
+                response.append("disabled\n");
+            } else {
+                response.append("enabled\n");
+            }
+        }
+        return response.toString();
+    }
+
 
     /*
     @dev: This method clicks the disables a given camera
@@ -89,12 +108,11 @@ public class Tracker {
         // Creates the sockets
         try (ZContext context = new ZContext()) {
             ZMQ.Socket server = context.createSocket(SocketType.REP);
-            server.bind("tcp://localhost:5555");  // Localhost because this is the server
+            server.bind("tcp://*:5555");  // address * to listen 
 
             // While(true) to keep the server listening
             while (true) {
                 // Gets the camera index from the client
-                // (counterpart to lines 66-67 or lines 97-98 of CameraSelection.java)
                 byte[] cameraIndexData = server.recv();
                 int cameraIndex = java.nio.ByteBuffer.wrap(cameraIndexData).getInt();
 
@@ -103,27 +121,34 @@ public class Tracker {
                     // Has to close the app
                     t.stopProgram();
 
-                    // Informs the client of the closing status (counterpart of lines 70-71 of CameraSelection.java)
-                    String response = "Server succesfully stopped";
+                    // Informs the client of the closing status
+                    String response = "\nServer succesfully stopped";
                     server.send(response.getBytes(ZMQ.CHARSET), 0);
 
                     // Leaves the loop to end the execution
                     break;
 
+                } else if (cameraIndex == 14) {
+                    // Gets if the cameras are enabled or disabled
+                    
+                    // Tells the client the enable/disable states of all cameras
+                    String response = t.getDisabledCameras();
+                    server.send(response.getBytes(ZMQ.CHARSET), 0);
+
                 } else {
                     // Got an index of a camera to interact with
 
-                    // Tells the client the camera index was received (counterpart to line 101 of CameraSelection.java)
-                    boolean value1 = true;
-                    server.send(new byte[]{(byte) (value1 ? 1 : 0)}, 0);
+                    // Tells the client the camera index was received
+                    boolean syncronizationFlag1 = true;
+                    server.send(new byte[]{(byte) (syncronizationFlag1 ? 1 : 0)}, 0);
 
-                    // Gets the option from the client (counterpart to lines 104-105 of CameraSelection.java)
+                    // Gets the enable7disable option from the client
                     byte[] optionData = server.recv();
                     int option = java.nio.ByteBuffer.wrap(optionData).getInt();
 
-                    // Tells the client the option was received (counterpart to line 108 of CameraSelection.java)
-                    boolean value2 = true;
-                    server.send(new byte[]{(byte) (value2 ? 1 : 0)}, 0);
+                    // Tells the client the option was received
+                    boolean syncronizstionFlag2 = true;
+                    server.send(new byte[]{(byte) (syncronizstionFlag2 ? 1 : 0)}, 0);
 
                     // Executes the enable/disable action
                     cameraIndex--;  // Arrays are from 0 to n-1, human input comes from 1 to n
@@ -134,7 +159,10 @@ public class Tracker {
                         response = t.enableViconCamera(cameraIndex);
                     }
 
-                    // Tells the client the output of enable/disable (counterpart of lines 111-112 of CameraSelection.java)
+                    // Gets the signal from the client to send the final response
+                    server.recv(0);
+
+                    // Tells the client the output of enable/disable 
                     server.send(response.getBytes(ZMQ.CHARSET), 0);
                 }
 

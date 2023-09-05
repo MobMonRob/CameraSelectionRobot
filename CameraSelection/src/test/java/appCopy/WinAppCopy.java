@@ -4,15 +4,10 @@
  */
 package appCopy;
 
-/**
- *
- * @author rahm-
- */
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-
 
 import io.appium.java_client.windows.WindowsDriver;
 import java.awt.AWTException;
@@ -79,7 +74,7 @@ public class WinAppCopy {
     private WindowsDriver winDriver;  // To interact with the GUI
 
     // Constructor
-    public WinAppCopy () throws AWTException, MalformedURLException, IOException, InterruptedException {
+    public WinAppCopy() throws AWTException, MalformedURLException, IOException, InterruptedException {
         openApps();
         robot = new Robot();
         cameraNames = new String[]{"#1 5 (Vero v2.2)",
@@ -254,7 +249,6 @@ public class WinAppCopy {
         // Scrolls all the way up (negative to scroll up)
         for (int i = 0; i < 4; i++) {
             robot.mouseWheel(-4);  // No more than 4, if you put more, it may get stuck
-            Thread.sleep(300);  // Necessary delay to give chance for Vicon Tracker to react
         }
     }
 
@@ -288,7 +282,7 @@ public class WinAppCopy {
         } catch (NoSuchElementException e) {
             // The camera was not visible, must scroll down a little bit
             robot.mouseWheel(2);  // No more than 4, if you put more, it may get stuck
-            Thread.sleep(300);  // Necessary delay to give chance for Vicon Tracker to react
+            //Thread.sleep(100);  // Necessary delay to give chance for Vicon Tracker to react
             
             // Searches the camera again
             winDriver.findElementByName(cameraNames[cameraIndex]).click();
@@ -325,6 +319,7 @@ public class WinAppCopy {
         String xPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QWidget\"]/Table[@ClassName=\"VParamListView\"]/DataItem[@Name=\"" + value + "\"]";
 
         // It looks for the element on the screen
+        boolean found = false;
         try {
             winDriver.findElementByXPath(xPath).click();  // Goes to the element
             // Adjust the mouse location to the actual checkbox
@@ -333,14 +328,15 @@ public class WinAppCopy {
             robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
             robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 
-            // Moves the mouse a small offset just that it is not anymore over the checkbox to avoid enable/disable it by an accidental click
-            robot.mouseMove(MouseInfo.getPointerInfo().getLocation().x - 5, MouseInfo.getPointerInfo().getLocation().y - 5);
-
             // Informs the action was completed successfully
-            return true;
+            found = true;
         } catch (NoSuchElementException e) {
             // The element was not found
-            return false;
+            found = false;
+        } finally {
+            // Moves the mouse a to the video screen just that it is not anymore over the checkbox to avoid enable/disable it by an accidental click
+            robot.mouseMove(MouseInfo.getPointerInfo().getLocation().x + 500, MouseInfo.getPointerInfo().getLocation().y);
+            return found;
         }
     }
 

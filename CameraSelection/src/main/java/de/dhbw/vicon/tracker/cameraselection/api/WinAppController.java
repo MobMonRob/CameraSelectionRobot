@@ -72,19 +72,19 @@ public class WinAppController {
     public WinAppController() throws AWTException, MalformedURLException, IOException, InterruptedException {
         openApps();
         robot = new Robot();
-        cameraNames = new String[]{"#1 5 (Vero v2.2)",
-            "#2 6 (Vero v2.2)",
-            "#3 7 (Vero v2.2)",
-            "#4 8 (Vero v2.2)",
-            "#5 1 (Vero v2.2)",
-            "#6 2 (Vero v2.2)",
-            "#7 11 (Vero v2.2)",
-            "#8 3 (Vero v2.2)",
-            "#9 9 (Vero v2.2)",
-            "#10 10 (Vero v2.2)",
-            "#11 4 (Vero v2.2)",
-            "#12 13 (Vero v2.2)",
-            "#13 12 (Vero v2.2)"};
+        cameraNames = new String[]{"#1 (Vero v2.2)",
+            "#2 (Vero v2.2)",
+            "#3 (Vero v2.2)",
+            "#4 (Vero v2.2)",
+            "#5 (Vero v2.2)",
+            "#6 (Vero v2.2)",
+            "#7 (Vero v2.2)",
+            "#8 (Vero v2.2)",
+            "#9 (Vero v2.2)",
+            "#10 (Vero v2.2)",
+            "#11 (Vero v2.2)",
+            "#12 (Vero v2.2)",
+            "#13 (Vero v2.2)"};
     }
 
     /*
@@ -244,7 +244,7 @@ public class WinAppController {
         // Scrolls all the way up (negative to scroll up)
         for (int i = 0; i < 4; i++) {
             robot.mouseWheel(-4);  // No more than 4, if you put more, it may get stuck
-            Thread.sleep(300);  // Necessary delay to give chance for Vicon Tracker to react
+            Thread.sleep(25);  // Necessary delay to give chance for Vicon Tracker to react
         }
     }
 
@@ -277,26 +277,11 @@ public class WinAppController {
             winDriver.findElementByName(cameraNames[cameraIndex]).click();
         } catch (NoSuchElementException e) {
             // The camera was not visible, must scroll down a little bit
-            robot.mouseWheel(2);  // No more than 4, if you put more, it may get stuck
-            Thread.sleep(300);  // Necessary delay to give chance for Vicon Tracker to react
-            
+            robot.mouseWheel(2);
+
             // Searches the camera again
             winDriver.findElementByName(cameraNames[cameraIndex]).click();
         }
-    }
-
-    /*
-    @dev: it puts the subarea that contains the checkbox in the correct position
-          to make sure the checkbox is visible
-          Relies on the method arrangeAreaByXPath()
-    @param: None
-    @returns: void
-    @author: Andres Masis
-     */
-    private void arrangeCheckboxArea() throws InterruptedException {
-        // Clicks on the Properties label (closest element)
-        String xPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VParamListHeader\"]";
-        arrangeAreaByXPath(xPath);
     }
 
     /*
@@ -308,13 +293,11 @@ public class WinAppController {
     @author: Anddres Masis
      */
     protected boolean clickCheckbox(String value) throws InterruptedException {
-        // Makes sure everything is in the correct position on the screen
-        arrangeCheckboxArea();
-
         // Get the path of the true/false checkbox to find it on screen
         String xPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QWidget\"]/Table[@ClassName=\"VParamListView\"]/DataItem[@Name=\"" + value + "\"]";
 
         // It looks for the element on the screen
+        boolean found = false;
         try {
             winDriver.findElementByXPath(xPath).click();  // Goes to the element
             // Adjust the mouse location to the actual checkbox
@@ -323,15 +306,75 @@ public class WinAppController {
             robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
             robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 
-            // Moves the mouse a small offset just that it is not anymore over the checkbox to avoid enable/disable it by an accidental click
-            robot.mouseMove(MouseInfo.getPointerInfo().getLocation().x - 5, MouseInfo.getPointerInfo().getLocation().y - 5);
-
             // Informs the action was completed successfully
-            return true;
+            found = true;
         } catch (NoSuchElementException e) {
             // The element was not found
-            return false;
+            found = false;
+        } finally {
+            // Moves the mouse a to the video screen just that it is not anymore over the checkbox to avoid enable/disable it by an accidental click
+            robot.mouseMove(MouseInfo.getPointerInfo().getLocation().x + 500, MouseInfo.getPointerInfo().getLocation().y);
+            return found;
         }
+    }
+    
+    /*
+    @dev: This method get for each one of all the cameras if it is enabled or disabled
+         It gets it by the value of the enabled checkbox in the Properties panel
+         It works with the disabled XPath, the enabled XPath does not work properly
+    @param: None
+    @returns: Array of booleans, for each postion
+              True if the camera of that index was enabled
+              False if the camera of that index was disabled
+    */
+    protected boolean[] getDisabledCameras() throws InterruptedException {
+        // Array that will be returned
+        boolean[] statesArray = new boolean[13];
+        // Get the path of the checkbox, ONLY APPLIES FOR DISABLED
+        String disabledPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QWidget\"]/Table[@ClassName=\"VParamListView\"]/DataItem[@Name=\"false\"]";
+
+        // Arranges the screen correctly to make sure the cameras will be found
+        arrangeCameraArea();
+
+        // Goes camera by camera checking its enabled/disabled state
+        for (int i = 0; i < 7; i++) {
+            // Selects the camera on the Vicon Tracker GUI
+             winDriver.findElementByName(cameraNames[i]).click();
+
+            try {
+                // Goes to the element
+                winDriver.findElementByXPath(disabledPath).click();
+                // The enabled element was found successfully
+                statesArray[i] = true;
+
+            } catch (NoSuchElementException e) {
+                // The enabled element was not found, therefore, it is disabled
+                statesArray[i] = false;
+            }
+        }
+
+        // The rest of the cameras are not visible
+        winDriver.findElementByName(cameraNames[0]).click();  // Moves the mouse from the Properties panel to the cameras panel
+        robot.mouseWheel(2);  // Scrolls down
+
+        // Continues the process with the rest of the cameras
+        for (int i = 7; i < 13; i++) {
+            // Selects the camera on the Vicon Tracker GUI
+            winDriver.findElementByName(cameraNames[i]).click();
+            
+            try {
+                // Goes to the element
+                winDriver.findElementByXPath(disabledPath).click();
+                // The enabled element was found successfully
+                statesArray[i] = true;
+
+            } catch (NoSuchElementException e) {
+                // The enabled element was not found, therefore, it is deisabled
+                statesArray[i] = false;
+            }
+        }
+        
+        return statesArray;
     }
 
     /*
@@ -385,6 +428,21 @@ public class WinAppController {
         winDriver.findElementByName("Schließen").click();  // Closes the Vicon Tracker
         winDriver.quit(); // Stops the WinApp driver     
         new ProcessBuilder("taskkill", "/F", "/IM", "WinAppDriver.exe").start(); // Shuts down the WinApp server
+    }
+    
+    @dev: it puts the subarea that contains the checkbox in the correct position
+          to make sure the checkbox is visible
+          Relies on the method arrangeAreaByXPath()
+          Seems to be not necessary because the area of the checkbox
+          always starts on the correct position when a camera is clicked
+          Still, it is good to keep it in comments just in case
+    @param: None
+    @returns: void
+    @author: Andres Masis
+    private void arrangeCheckboxArea() throws InterruptedException {
+        // Clicks on the Properties label (closest element)
+        String xPath = "/Pane[@ClassName=\"#32769\"][@Name=\"Desktop 1\"]/Window[@Name=\"VICON TRACKER 3.10\"][@AutomationId=\"MainWindow\"]/Window[@ClassName=\"QDockWidget\"][@Name=\"RESOURCES\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VDataBrowser\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QTabWidget\"]/Custom[@ClassName=\"QStackedWidget\"]/Custom[@ClassName=\"QSplitter\"]/Group[@ClassName=\"QWidget\"]/Group[@ClassName=\"VParamListHeader\"]";
+        arrangeAreaByXPath(xPath);
     }
      */
 }

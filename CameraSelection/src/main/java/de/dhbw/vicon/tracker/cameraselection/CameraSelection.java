@@ -39,21 +39,24 @@ public class CameraSelection {
         // Connect to the server
         try (ZContext context = new ZContext()) {
             ZMQ.Socket client = context.createSocket(SocketType.REQ);
-            String remoteMachineAddress = "185.52.247.41:5555";  // Dr. Olver´s laptop in the lab address 
-            client.connect(remoteMachineAddress);
+            String remoteMachineAddress = "192.168.10.1";  // Dr. Oliver´s laptop in the lab ip address 
+            String completeAddress = "tcp://" + remoteMachineAddress + ":5555";
+            client.connect(completeAddress);
 
             // Menu to interact with the user
             int cameraIndex = 0;
             while (true) {
                 // Ask the user for an option
-                System.out.println("What camera do you want to interact with"
-                        + "\nSend 0 to close the program");
+                System.out.println("\n\n-----------------------------------------------------------------------"
+                        + "\nWhat camera do you want to interact with\n"
+                        + "\nSend 0 to close the program"
+                        + "\nSend 14 to if it is enabled/disabled for all the cameras");
 
                 // Try-catch in case the user enters a non integer value
                 try {
                     cameraIndex = scanner.nextInt();
                 } catch (InputMismatchException e) {
-                    System.out.println("Invalid input. Please enter an integer between 0 to 13.");
+                    System.out.println("\nInvalid input. Please enter an integer between 0 to 13.");
                     scanner.nextLine();
                     continue;
                 }
@@ -62,21 +65,35 @@ public class CameraSelection {
                 if (cameraIndex == 0) {
                     // Has to close the app
 
-                    // Sends the camera index 0 to the server to shut it down (counterpart of lines 98-99 of Tracker.java)
+                    // Sends the option to the server to shut down
                     byte[] cameraIndexData = java.nio.ByteBuffer.allocate(4).putInt(cameraIndex).array();
                     client.send(cameraIndexData, 0);
 
-                    // Waits for the server response (counterpart of line 107-108 of Tracker.java)
+                    // Gets the response from the server
                     byte[] reply = client.recv();
                     System.out.println(new String(reply));
 
+                    // Exits and finishes the client
                     break;
+
+                } else if (cameraIndex == 14) {
+                    // Gets if the cameras are enabled or disabled for all of them
+                    System.out.println("Wait a little bit. This may take a while.\n");
+
+                    // Sends the option to the server to get the state
+                    byte[] cameraIndexData = java.nio.ByteBuffer.allocate(4).putInt(cameraIndex).array();
+                    client.send(cameraIndexData, 0);
+
+                    // Gets the response from the server
+                    byte[] reply = client.recv();
+                    System.out.println(new String(reply));
 
                 } else if (cameraIndex >= 1 && cameraIndex <= 13) {
                     // Valid camera
 
                     // Ask the user if it wants to enable or disable
-                    System.out.println("Press 0 to disable the camera"
+                    System.out.println("\n-----------------------------------------------------------------------------"
+                            + "\nPress 0 to disable the camera"
                             + "\nPress 1 to enable the camera");
                     int option;
 
@@ -93,37 +110,41 @@ public class CameraSelection {
                     if (option == 0 || option == 1) {
                         // Valid camera index and enable/disable input   
 
-                        // Sends the camera index to the server (counterpart of lines 98-99 of Tracker.java)
+                        // Sends the camera index to the server
                         byte[] cameraIndexData = java.nio.ByteBuffer.allocate(4).putInt(cameraIndex).array();
                         client.send(cameraIndexData, 0);
 
-                        // Waits for the response of the server the cameraIndex was received (counterpart of lines 117-118 of Tracker.java)
+                        // Gets back the response of the server for syncronization
                         client.recv(0);
 
-                        // Sends the option to the server (counterpart of lines 121-122 of Tracker.java)
+                        // Sends the enable/disable option to the server
                         byte[] optionData = java.nio.ByteBuffer.allocate(4).putInt(option).array();
                         client.send(optionData, 0);
 
-                        // Waits for the response of the server the option was received (counterpart of lines 125-126 of Tracker.java)
+                        // Gets back the response of the server for syncronization
                         client.recv(0);
 
-                        // Waits for the server response of the enable/disable action (counterpart of line 138 of Tracker.java)
+                        // Tells the server it can send a response
+                        boolean syncronizationFlag = true;
+                        client.send(new byte[]{(byte) (syncronizationFlag ? 1 : 0)}, 0);
+
+                        // Gets the  final result response from the server
                         byte[] reply = client.recv();
                         System.out.println(new String(reply));
 
                     } else {
-                        System.out.println("Invalid enable/disable option");
+                        System.out.println("\nInvalid enable/disable option");
                     }
 
                 } else {
-                    System.out.println("Invalid camera index");
+                    System.out.println("\nInvalid camera index");
                 }
 
             }
 
             // Out of the loop (menu is not running anymore)
             context.destroy();  // Closes the JeroMQ sockets context
-            System.out.println("Program closed succesfully");
+            System.out.println("\nProgram closed succesfully");
         }
 
     }
