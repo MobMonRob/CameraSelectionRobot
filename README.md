@@ -3,8 +3,31 @@
 CameraSelectionRobot is a program that allows to automatically enable and disable cameras on the Vicon Tracker GUI.
 
 ## Necessary external resources and configurations
-WinAppDriver Server
-Developer Mode
+### WinAppDriver Server
+This is a program that must be downloaded, in order for CameraSelection to work. The CameraSelection program starts it and stops it automatically, so you just have to worry of having this installed on the Server Machine with the Vicon Tracker.
+
+#### Download
+1. You can download it from: https://github.com/Microsoft/WinAppDriver/releases
+2. Scroll down to WinAppDriver v1.2.1 and look on the bottom for the Assets section
+3. There you must download the WindowsApplicationDriver_1.2.1.msi
+4. Click on the download it file to open the installation Wizard
+5. Just follow the Wizard instructions, do not change any default configuration or the CameraSelection program will not work.
+
+#### Access in your Computer
+Once you have installed the WinAppDriver, you can make sure it is properly installed with the following steps (remember not to change the installation wiyard settings):
+1. Go to C:\Program Files (x86)
+2. Then look for a folder named Windows Application Driver
+3. Inside that folder click on the executable WinAppDriver
+4. It should open a terminal with the message: "Windows Application Driver listening for requests at: http://127.0.0.1:4723/"
+
+After this you can close that terminal, it is only for testing. In summary, the location of the executable is: C:\Program Files (x86)\Windows Application Driver 
+> You can also find it in video, at minute 8:30 of:
+>  https://www.youtube.com/watch?v=jVjg2WOO6-8&list=PLnxpMuIcxn1TG2Eupfj_16mDRVtYipKYe&index=2
+### Developer Mode
+This is a characteristic you must enable on the Windows System of the Server Machine with the Vicon Tracker.
+
+#### Steps
+1. 
 
 # Sockets Configuration
 Server has to have firewall off or allow incoming messages
