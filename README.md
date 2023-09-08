@@ -27,7 +27,8 @@ After this you can close that terminal, it is only for testing. In summary, the 
 This is a characteristic you must enable on the Windows System of the Server Machine with the Vicon Tracker.
 
 #### Steps
-1. 
+1. On your Windows Search bar type: "Developer setting" and hit enter.
+2. Enable the developer mode.
 
 # Sockets Configuration
 Server has to have firewall off or allow incoming messages
@@ -61,7 +62,16 @@ JeroMQ depedencies
 UI Recorder
 Inspect
 
+
+## Tried but discarded tools
+SikuliX
+JeroMQ
+Pure Selenium
+
+
 ## Encountered Problems
+Hardware too slow
+Image recognition too slow and unreliable
 The main class is not found
 Dependencies not loaded
 Java version not compatible 
@@ -77,10 +87,5 @@ Not able to connect with the WinAppDriver Server
 Connection lost between the client machine and the servef machine
 Port 5555 is already used
 The Vicon Tracker gets unplugged
-
-## Tried but discarded tools
-SikuliX
-JeroMQ
-Pure Selenium
 
 
