@@ -61,6 +61,12 @@ JeroMQ depedencies
 UI Recorder
 Inspect
 
+## Encountered Problems
+The main class is not found
+Dependencies not loaded
+Java version not compatible 
+Firewall popping up wit .jar
+
 # Possible problems
 The names of the cameras change
 Lack of exception Handling
