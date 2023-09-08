@@ -10,6 +10,10 @@ import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
 /**
+ * Make sure to build the .jar with the maven-assembly-plugin
+ * This should be added in the pom file of the project
+ * This plugin is found in the first answer of:
+ * https://stackoverflow.com/questions/1729054/including-dependencies-in-a-jar-with-maven
  *
  * This class acts as the remote client. It allows the user to interact with the
  * server remotely. This class only to get user input and send it to the server
@@ -36,9 +40,9 @@ public class CameraSelection {
         // To read user´s input
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Before running to this program, make sure that the API in the server is already running\n"
-                + "It is highly recommended to run this program at least 30 seconds after the server API is started to give time of the GUI Tracker to load everything \n"
-                + "If the previous conditions are not met, it is recommended to close this program and start it again when the server API is running and the Vicon Tracker has loaded prperly\n");
+        System.out.println("Before running this program, make sure that the API in the server is already running\n"
+                + "It is highly recommended to run this program at least 30 seconds after the server API is started, to give time of the GUI Tracker to load everything \n"
+                + "If the previous conditions are not met, it is recommended to close this program and start it again when the server API is running and the Vicon Tracker has loaded properly\n");
         // Connect to the server
         try (ZContext context = new ZContext()) {
             ZMQ.Socket client = context.createSocket(SocketType.REQ);

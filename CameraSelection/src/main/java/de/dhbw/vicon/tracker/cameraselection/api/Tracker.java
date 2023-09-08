@@ -8,6 +8,10 @@ import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
 /**
+ * Make sure to build the .jar with the maven-assembly-plugin This should be
+ * added in the pom file of the project This plugin is found in the first answer
+ * of:
+ * https://stackoverflow.com/questions/1729054/including-dependencies-in-a-jar-with-maven
  *
  * This class acts as the server that's running on the same computer of the
  * Vicon Tracker. It allows the user to enable and disable the cameras remotely.
@@ -60,6 +64,12 @@ public class Tracker {
         }
     }
 
+    /*
+    @dev: This method gets which cameras are enabled or disabled
+    @param: None
+    @return: Message telling for all cameras if it is enabled or disabled
+    @author: Andres Masis
+     */
     private String getDisabledCameras() throws InterruptedException {
         // Element to store the result to return
         StringBuilder response = new StringBuilder();
@@ -76,6 +86,10 @@ public class Tracker {
             }
         }
         return response.toString();
+    }
+    
+    private void closeFirewallPopup() {
+        winAppController.closeFirewall();
     }
 
 
@@ -110,6 +124,9 @@ public class Tracker {
             ZMQ.Socket server = context.createSocket(SocketType.REP);
             server.bind("tcp://*:5555");  // address * to listen 
 
+            // Closes the firewall pop up window
+            t.closeFirewallPopup();
+
             // While(true) to keep the server listening
             while (true) {
                 // Gets the camera index from the client
@@ -130,7 +147,7 @@ public class Tracker {
 
                 } else if (cameraIndex == 14) {
                     // Gets if the cameras are enabled or disabled
-                    
+
                     // Tells the client the enable/disable states of all cameras
                     String response = t.getDisabledCameras();
                     server.send(response.getBytes(ZMQ.CHARSET), 0);

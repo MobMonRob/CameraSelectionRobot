@@ -20,6 +20,11 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 /**
+ * Make sure to build the .jar with the maven-assembly-plugin
+ * This should be added in the pom file of the project
+ * This plugin is found in the first answer of:
+ * https://stackoverflow.com/questions/1729054/including-dependencies-in-a-jar-with-maven
+ * 
  * PREREQUISITES TO USE WINAPP DRIVER
  *
  * Install WinApp Driver from:
@@ -223,6 +228,18 @@ public class WinAppController {
         if (isAppRunning(processName)) {
             closeApp(processName);
         }
+    }
+    
+    /*
+    @dev: This method closes the pop up of the firewall when the .jar runs
+          When the sockets start, the firewall puts a pop up window that blocks the rest of the program asks for the server
+          This method closes that pop up window by clicking on the "Zugriff zulassen" button
+    @param: None
+    @return: void
+    @author: Andres
+     */
+    protected void closeFirewall() {
+        winDriver.findElementByName("Zugriff zulassen").click();
     }
 
     /*
