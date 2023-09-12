@@ -39,13 +39,15 @@ Client has to be configured to the  Vicon Network (out of the code)
 ### Code Configuration
 The current code already has the proper settings, but in case you want to modify something, make sure that:
 - When creating the socket, the code in the client computer points to the address of the server computer. In this case 192.168.10.1. For example:
-```java
-String remoteMachineAddress = "192.168.10.1";  // Dr. Oliver´s laptop in the lab ip address
-String completeAddress = "tcp://" + remoteMachineAddress + ":5555";
-```
-Use * for ip address in the server
-Both computers use port 5555
-
+  ```Java
+  String remoteMachineAddress = "192.168.10.1";  // Dr. Oliver´s laptop in the lab ip address
+  String completeAddress = "tcp://" + remoteMachineAddress + ":5555";
+  ```
+- Use * for ip address when creating the sockets in the server machine. This is to ensure that it will listen to incoming petitions. For example:
+  ```Java
+  server.bind("tcp://*:5555");
+  ```
+- Make sure that both computers use the same port. Currently they use the port 5555.
 
 ## How to run
 
