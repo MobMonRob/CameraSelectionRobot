@@ -30,9 +30,19 @@ This is a characteristic you must enable on the Windows System of the Server Mac
 1. On your Windows Search bar type: "Developer setting" and hit enter.
 2. Enable the developer mode.
 
-# Sockets Configuration
+## Sockets Configuration
+
+### Environment Configuration
 Server has to have firewall off or allow incoming messages
 Client has to be configured to the  Vicon Network (out of the code)
+
+### Code Configuration
+The current code already has the proper settings, but in case you want to modify something, make sure that:
+- When creating the socket, the code in the client computer points to the address of the server computer. In this case 192.168.10.1. For example:
+```java
+String remoteMachineAddress = "192.168.10.1";  // Dr. Oliver´s laptop in the lab ip address
+String completeAddress = "tcp://" + remoteMachineAddress + ":5555";
+```
 Use * for ip address in the server
 Both computers use port 5555
 
