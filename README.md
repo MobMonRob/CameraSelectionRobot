@@ -23,6 +23,7 @@ Once you have installed the WinAppDriver, you can make sure it is properly insta
 After this you can close that terminal, it is only for testing. In summary, the location of the executable is: C:\Program Files (x86)\Windows Application Driver 
 > You can also find it in video, at minute 8:30 of:
 >  https://www.youtube.com/watch?v=jVjg2WOO6-8&list=PLnxpMuIcxn1TG2Eupfj_16mDRVtYipKYe&index=2
+> 
 ### Developer Mode
 This is a characteristic you must enable on the Windows System of the Server Machine with the Vicon Tracker.
 
@@ -33,8 +34,24 @@ This is a characteristic you must enable on the Windows System of the Server Mac
 ## Sockets Configuration
 
 ### Environment Configuration
-Server has to have firewall off or allow incoming messages
-Client has to be configured to the  Vicon Network (out of the code)
+- The server machine has to have firewall off or allow incoming messages. The computer of the lab normally has the firewall off.
+- The client machine has to be configured to the Vicon Network.
+1. Plug in the Ethernet cable into the client machine
+2. Go to Control Panel
+3. Go to Networks and Internet
+4. Click on the first option, Networks and shared resources
+5. On the Ethernet section, click on the network. That will open a new window.
+6. On the new window click on Properties. That will open another Window.
+7. On the new window, leave everything disabled but Internet Protocol Version 4 (TCP/IP v4). That is the only one that should be enabled.
+8. Then click on Internet Protocol Version 4 (TCP/IP v4). That will open another window.
+9. On that window click on use the following address.
+10. Put as IP address 192.168.10.x, where x is any number not used yet in the network, 193 for example. For mask put 255.255.255.0.
+11. Then click Ok on all the windows to close them and save the changes.
+
+   To make sure everything is working correctly, you can type the following command on the terminal of the client.
+   ```
+   ping 192.168.10.1
+   ```
 
 ### Code Configuration
 The current code already has the proper settings, but in case you want to modify something, make sure that:
@@ -61,13 +78,18 @@ Run client.jar
 After 30 seconds and server must be on 
 
 ## Used tools
-JeroMQ
-WinAppDriver
-Java Robot
+
+### JeroMQ
+
+### WinAppDriver
+
+### Java Robot
 
 ## Dependencies Setup
-WinAppDriver dependencies
-JeroMQ depedencies
+
+### WinAppDriver dependencies
+
+### JeroMQ depedencies
 
 
 ## Recommended Tools for Developers
