@@ -22,8 +22,9 @@ Once you have installed the WinAppDriver, you can make sure it is properly insta
 
 After this you can close that terminal, it is only for testing. In summary, the location of the executable is: C:\Program Files (x86)\Windows Application Driver 
 > You can also find it in video, at minute 8:30 of:
->  https://www.youtube.com/watch?v=jVjg2WOO6-8&list=PLnxpMuIcxn1TG2Eupfj_16mDRVtYipKYe&index=2
 > 
+>  https://www.youtube.com/watch?v=jVjg2WOO6-8&list=PLnxpMuIcxn1TG2Eupfj_16mDRVtYipKYe&index=2
+
 ### Developer Mode
 This is a characteristic you must enable on the Windows System of the Server Machine with the Vicon Tracker.
 
@@ -77,49 +78,145 @@ Do not touch it
 Run client.jar
 After 30 seconds and server must be on 
 
-## Used tools
+## Used tools (Libraries and Dependencies)
 
 ### JeroMQ
+This is a dependency for the socktes. It allows client-server model. **Important:** It forces to send a request and get a response. For example, without a previous request the server cannot send a message to the client. 
+> More information at:
+> https://github.com/zeromq/jeromq/tree/master
+
+#### Important Methods
+```Java
+try(ZContext context = new ZContext())
+ZMQ.Socket socket = context.createSocket(SocketType.REQ);
+socket.connect(otherMachineAddress);
+
+socket.send(Data, 0);
+socket.recv();
+```
+* You may need more methods, those are just the most common ones.
+
+#### Dependency Setup
+**Maven**
+```xml
+    <dependency>
+      <groupId>org.zeromq</groupId>
+      <artifactId>jeromq</artifactId>
+      <version>0.5.3</version>
+    </dependency>
+```
 
 ### WinAppDriver
+This is a dependency for GUI automation. Windows version of Selenium. Works with the IDs of accesibility. 
+> More information at:
+> 
+> https://youtube.com/playlist?list=PLnxpMuIcxn1TG2Eupfj_16mDRVtYipKYe&si=4cprlRQje5FBwzh9
+
+#### Important Methods
+```Java
+// Creation
+Desktop desktop = Desktop.getDesktop();
+desktop.open(new File("file path"));
+DesiredCapabilities capabilities = new DesiredCapabilities();
+capabilities.setCapability("app", "Root");
+// URL is deprecated but must be used because it is the one supported by WindowsDriver
+winDriver = new WindowsDriver(new URL("http://127.0.0.1:4723"), capabilities);
+
+// find methods
+winDriver.findElementByName("something");
+winDriver.findElementByXPath("something");
+
+//
+findBySomething().click();
+```
+
+#### Dependency Setup
+** Maven **
+2 dependencies are necessary-
+
+*Selenium*
+```xml
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>3.141.59</version>
+    </dependency>
+```
+
+*Appium*
+```xml
+    <dependency>
+      <groupId>io.appium</groupId>
+      <artifactId>java-client</artifactId>
+      <version>7.4.1</version>
+    </dependency>
+```
+
+> More information at minute 2:00 of:
+>
+> https://www.youtube.com/watch?v=165imUZ0098&list=PLnxpMuIcxn1TG2Eupfj_16mDRVtYipKYe&index=3
 
 ### Java Robot
+This library is to move the mouse with code. It is a JDK library.
 
-## Dependencies Setup
+#### Important Methods
+```Java
+robot.mouseMove(x, y);
+robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+robot.mouseWheel(java);
+```
 
-### WinAppDriver dependencies
-
-### JeroMQ depedencies
-
+> More information in:
+>
+> https://docs.oracle.com/javase/8/docs/api/java/awt/Robot.html
 
 ## Recommended Tools for Developers
-UI Recorder
-Inspect
+### UI Recorder
+### Inspect
 
 
 ## Tried but discarded tools
-SikuliX
-JeroMQ
-Pure Selenium
+
+### SikuliX
+
+### OpenCV
+
+### Pure Selenium
 
 
 ## Encountered Problems
-Hardware too slow
-Image recognition too slow and unreliable
-The main class is not found
-Dependencies not loaded
-Java version not compatible 
-Firewall popping up wit .jar
 
-# Possible problems
-The names of the cameras change
-Lack of exception Handling
-Vicon Tracker GUI not on full screen or another GUI in front
-Resolution of the screen chages and the oofsets does not match
-Someone uses the mouse at the same time
-Not able to connect with the WinAppDriver Server
-Connection lost between the client machine and the servef machine
-Port 5555 is already used
-The Vicon Tracker gets unplugged
+### Hardware too slow
+
+### Image recognition too slow and unreliable
+
+### The main class is not found
+
+### Dependencies not loaded
+
+### Java version not compatible 
+
+### Firewall popping up wit .jar
+
+## Possible problems
+
+### The names of the cameras change
+
+### Lack of exception Handling
+
+### Vicon Tracker GUI not on full screen or another GUI in front
+
+### Resolution of the screen chages and the oofsets does not match
+
+### Someone uses the mouse at the same time
+
+### Not able to connect with the WinAppDriver Server
+
+### Connection lost between the client machine and the servef machine
+
+### Port 5555 is already used
+
+### The Vicon Tracker gets unplugged
 
 
