@@ -131,8 +131,8 @@ findBySomething().click();
 ```
 
 #### Dependency Setup
-** Maven **
-2 dependencies are necessary-
+**Maven**
+2 dependencies are necessary
 
 *Selenium*
 ```xml
