@@ -69,7 +69,7 @@ The current code already has the proper settings, but in case you want to modify
 
 ## How to run
 
-# Server
+### Server
 Run Server.jar
 Wait 30 seconds
 Do not touch it
