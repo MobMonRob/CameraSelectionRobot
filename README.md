@@ -172,10 +172,56 @@ robot.mouseWheel(java);
 >
 > https://docs.oracle.com/javase/8/docs/api/java/awt/Robot.html
 
-## Recommended Tools for Developers
-### UI Recorder
-### Inspect
 
+## Recommended Tools for Developers
+To use the WinAppDriver methods, you need to know the automation ID, name, XPath or another identifier of the GUI elements you want to interact with. These are recommended tools for that.
+
+### Inspect
+This tool gives you the name, automation ID, group and other details of the element under the mouse in that specific moment.
+
+#### Download
+You can donwload from: https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/
+1. Click on *Download Installer*
+2. Once downloaded, execute the Wizard
+3. In the Wizard. For the step of *Select the features you want to download*, disable the options:
+   - Windows Performance Toolkit
+   - Debugging Tools for Windows
+   - .NET Framework 4.8 Software Development Kit
+   - Windows App Certification Kit
+   - Windows IP Over USB
+   - MSI Tools
+     
+   -- For all the other steps just click next with all the default settings until the installation is finished.
+
+> More information of the download in minute 6:45 of:
+>
+> https://www.youtube.com/watch?v=IlkPsJiGUYA&list=PLnxpMuIcxn1TG2Eupfj_16mDRVtYipKYe&index=2
+
+#### Use
+1. Open the inspect.exe. It should be in: "C:\Program Files (x86)\Windows Kits\10\bin\version\x64. (Where version is the latest you find in the folder, something like 10.0.19041.0)
+
+### UI Recorder
+This tool allows you to record your actions in a period of time (started and paused by you). It generates the XPath for each element the mouse interacted with during tht period.
+#### Download
+This tool can be downloaded from: https://github.com/Microsoft/WinAppDriver/releases
+1. Go to **WinAppDriver UI Recorder v1.1**
+2. Go to Assets and download WinAppDriverUIRecorder.zip
+3. Go to the zip in your computer and extract it
+4. Open the Wizard and just click next to install it on your computer.
+> More information about the download in minute 12:05 of:
+>
+> https://www.youtube.com/watch?v=IlkPsJiGUYA&list=PLnxpMuIcxn1TG2Eupfj_16mDRVtYipKYe&index=2
+
+#### Use
+1. Go to folder of installation you selected in the wizard
+2. Open UI Recorder executable
+3. Once the program opens, click on Record and do all the actions you need to record
+4. When you have done all of the actions you had to record, click on Pause in the UI Recorder
+5. Over the button clear, you will find a display menu. Click on that the see all the actions you recorded
+6. Select the desired action. On the top pane you can see the XPath and copy it to clipboard
+> More information at:
+>
+> https://www.youtube.com/watch?v=86n3f3CN2h0&list=PLnxpMuIcxn1TG2Eupfj_16mDRVtYipKYe&index=8
 
 ## Tried but discarded tools
 
