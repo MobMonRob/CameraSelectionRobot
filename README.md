@@ -222,48 +222,102 @@ This tool can be downloaded from: https://github.com/Microsoft/WinAppDriver/rele
 > More information at:
 >
 > https://www.youtube.com/watch?v=86n3f3CN2h0&list=PLnxpMuIcxn1TG2Eupfj_16mDRVtYipKYe&index=8
-
 ## Tried but discarded tools
+This section is about tools that were used during the development of the project, but were replaced because they did not give satisfactory results or its implementation produced errors.
 
 ### SikuliX
+SikuliX is a tool of image recognition. It was tried to detect elements on the screen, to be able to move the mouse to the correct position. It was discarded because it is extremely slow. Normally it took over 40 seconds just to locare a single element. And since it compares images, it is prone to errors like confusing 1 with 11.
 
 ### OpenCV
+OpenCV is another tool of computer vision that was suggested to replace SikuliX. It is supposed to be much more capable and faster than SikuliX. However, this tool was not used because for Java it comes as a library. This project is built with Maven, so it uses dependencies, not libraries. Since OpenCV was a library and not a dependecy the integration to the project generated many conflicts. Besides, it is also image recognition, so it is still prone to confuse elements.
 
 ### Pure Selenium
+Selenium is a verz popular automation tool that works with IDs. However, Selenium works for web browser to automate websites, not desktop apps like Vicon Tracker. The sholution was to use WinApp Driver, which is the desktop version of Selenium.
 
 
 ## Encountered Problems
+This section is about the problems that occured during the development of the project, and more important, how those were solved. In case a similar problem appears in the future. 
 
-### Hardware too slow
+### Performance of the lab laptop
+This is not a problem of the program, but of the environment, but still has to be taken into account. When the Vicon Tracker is running, the computer gets very slow because that program consumes a lot of resources. It not only affects this program. As long as the Vicon Tracker is running, the whole system gets slow. For example, even with this CameraSelection software not running, apps like NetBeans and Edge got extremely slow when the Vicon Tracker was also running. So, this problem is out of the scope of this project. The only recommendation is to have patience.
 
 ### Image recognition too slow and unreliable
+The first approach tried to find elements on the screen was image recognition. It was applied with SikuliX. But it was discarded because it was very slow as stated in the previous sections. Also it is not very accurate. The solution was to switch to another approach. Now the program works with automation IDs, names and XPaths, which is faster and more precise.
 
 ### The main class is not found
+When generating the .jar files in NetBeans with Clean and Build, none of the generated .jar files (the one of the server or the one of the client) could not find a main class. To solve that, in NetBeans go to the project and right click on it. Go to Properties->Run and there select the main class.
+You also have to add the following plugin the the pom file.
+```xml
+    <dependency>
+      <groupId>io.appium</groupId>
+      <artifactId>java-client</artifactId>
+      <version>7.4.1</version>
+    </dependency>
+```
+- Remember there to specify also the name of the main class including its package.
 
 ### Dependencies not loaded
+When generating the .jar files in NetBeans with Clean and Build, none of the generated .jar files (the one of the server or the one of the client) could not find a main class. To solve that, in NetBeans go to the project and right click on it. Go to Properties->Run and there select the main class.
 
 ### Java version not compatible 
 
 ### Firewall popping up wit .jar
 
 ## Possible problems
+This section describes problems that may appear during the execution of the program but have not been solved yet in the code. Since they have not been solved yet, a solution has to be implemented eventually. Also a possible solution is giving. This is just proposed and is not implemented yet. Since it is only a sugestion, feel free to follow another approach if you consider it better.
 
 ### The names of the cameras change
+This software looks for a specific name or automation ID. For example, "#1 5 (Vero v2.2)", "#2 6 (Vero v2.2)" Just changing 1 single character is enough to produce an error. You should be careful to not change the names of the cameras in the Vicon Tracker Software in the server computer.
+
+#### Possible solution
+Add a try-catch to handle when the cameras namer are not found. The catch clause can handle when the names are not found instead of just crashing. It can show I message like: "Cameras names not found. Cameras should have the following names: "#1 5 (Vero v2.2)", "#2 6 (Vero v2.2)", ..., "#13 12 (Vero v2.2)". So the human user knows the cameras names are producing conflict and be able to set the Vicon Tracker to the correct names.
 
 ### Lack of exception Handling
+In general, there is almost no try-catch clauses at all. So, whenever anything happens that does not follow the planned path, it may produce an error that crashes the program, instead of smoothly handling the execution. For example, if the WinAppController class crashes, the Tracker controller has no way to know it and it will only crash too. Or if the server crashes, the client does not receive any message so it will just eternally try to unsuccessfully connect with the server *(which is not running anymore).
+
+#### Possible solution
+In several points of the code, add the necessary try-catch exceptions to recover from the error. Or at least, inform the user about the occured problem and continue with the execution instead of crashing.
 
 ### Vicon Tracker GUI not on full screen or another GUI in front
+In order for the program to work properly, the Vicon Tracke GUI has to be completely visible and with the same resolution always. If this is not met, some elements that need to be modified, may not be visible.
 
-### Resolution of the screen chages and the oofsets does not match
+#### Possible solution
+Add a script to close all the applications in the computer except this program, the WinApp Driver and the Vicon Tracker (necessary programs for this tasks). To avoid any interference from another "innecessary" program. 
+
+### Resolution of the screen chages and the offsets does not match
+In order for the program to work properly, the Vicon Tracke GUI has to have the same resolution always. If this is not met, some elements that need to be modified, may not be visible or the mouse offsets may not work properly.
+
+#### Possible solution
+A script to click on the maximize button of the Vicon Tracker GUI can be added to meet the resolution criteria, full-screen.
 
 ### Someone uses the mouse at the same time
+This program moves the mouse, but it does not block this resource to other services. This means the human user or another program can try to use the mouse at the same time and lead to conflicts.
+
+#### Possible solution
+Block the use of the mouse during the execution. Another more gentle and recommendable approach is to send a message that the mouse is being share to ask the human user to stop using it or close other programs. And pause the esecution of this program until the mouse is not being shared anymore.
+
 
 ### Not able to connect with the WinAppDriver Server
+Sometimes, the WinApp driver server fails to receive the request. This is extremely unlikely to happens but the chances are not 0. If this happens, the program can not work because it lacks all the automation sevices.
 
-### Connection lost between the client machine and the servef machine
+#### Possible solution
+Find a message in the WinApp Driver of unsuccessful connection. Add a script to stop the current WinApp Driver instance and create a coonect to a new one, whenever that error message appears.
+
+### Connection lost between the client machine and the server machine
+If the connection is lost the program cannot continue because the human user cannot send instructions to the server machine in the lab. This may happen because the cable is loose, or the server crashed.
+
+#### Possible solution
+For every request message the client sends, it expects a response from the server. A timeout can be added. If after a given amount of seconds the client does not receive a response, the client print to the human user that the connection with the server was lost, to check factors like the cable connection or if the server is still running.
 
 ### Port 5555 is already used
+The port 5555 is the default port in this code. If it is already used by anothe application in one or both of the machines, it will lead to conflicts.
 
-### The Vicon Tracker gets unplugged
+#### Possible solution
+Whenever a port conflict is detected (either in the server or client machines), add a script to set another random port in both machines and try again until both machines have no problems.
 
+### The Vicon Tracker cable gets unplugged
+If the Vicon Tracker cable is not plugged into the hardware the Vicon Tracker Software cannot do anything and therefore this code neither. It is quite obvious that before starting a experiment, it has to be ensured that the hardware is ready to use. But still, it is good to have this case into account.
+
+#### Possible solution
+In the Tracker class, add a script to ensure the calbe is plugged in. Before starting to receive requests from the client, check in the Vicon Software GUI if the element with the name "Connected" is there. If not, send a message to the human user to go to plug in the cable and do not start the menu until the cable is pluggged in.
 
