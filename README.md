@@ -258,11 +258,13 @@ You also have to add the following plugin the the pom file.
 - Remember there to specify also the name of the main class including its package.
 
 ### Dependencies not loaded
-When generating the .jar files in NetBeans with Clean and Build, none of the generated .jar files (the one of the server or the one of the client) could not find a main class. To solve that, in NetBeans go to the project and right click on it. Go to Properties->Run and there select the main class.
+When generating the .jar files in NetBeans with Clean and Build, none of the generated .jar files (the one of the server or the one of the client) could not find a main class. Even clicking on Build with Dependencies was not useful. To solve this, only use in the pom file the exact same plugin of the previous point.
 
 ### Java version not compatible 
+The computer of the lab runs with Java version X. However, that version is already a bit old. So a .jar generated with a newer version of Java will not work in the computer of the lab. So, make sure that the .jar that ruins on the Server machine in the lab is built in the same coputer or a computer with Java version X or a bit older.
 
 ### Firewall popping up wit .jar
+When this program starts, everything is alright. But as soon as the server machine receives the fist request, it awakes the Firewall. The firewall sets a pop up window. This freezes the whole computer until the pop up is closed. To solve that, the fisrt request also activates a method to click on Accept on that pop up window.
 
 ## Possible problems
 This section describes problems that may appear during the execution of the program but have not been solved yet in the code. Since they have not been solved yet, a solution has to be implemented eventually. Also a possible solution is giving. This is just proposed and is not implemented yet. Since it is only a sugestion, feel free to follow another approach if you consider it better.
