@@ -248,11 +248,12 @@ The first approach tried to find elements on the screen was image recognition. I
 When generating the .jar files in NetBeans with Clean and Build, none of the generated .jar files (the one of the server or the one of the client) could not find a main class. To solve that, in NetBeans go to the project and right click on it. Go to Properties->Run and there select the main class.
 You also have to add the following plugin the the pom file.
 ```xml
-    <dependency>
-      <groupId>io.appium</groupId>
-      <artifactId>java-client</artifactId>
-      <version>7.4.1</version>
-    </dependency>
+      <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>14</maven.compiler.source>
+        <maven.compiler.target>14</maven.compiler.target>
+        <exec.mainClass>package.MainClass</exec.mainClass>
+    </properties>
 ```
 - Remember there to specify also the name of the main class including its package.
 
