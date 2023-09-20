@@ -22,11 +22,13 @@ import org.zeromq.ZMQ;
 public class TrackerCopy {
 
     // Class the contains the methods to controll automatically the Vicon Tracker
-    WinAppCopy winAppController;
+    private WinAppCopy winAppController;
+    private boolean firewallFlag;
 
     // Constructor
     private TrackerCopy () throws AWTException, IOException, MalformedURLException, InterruptedException {
         winAppController = new WinAppCopy();
+        firewallFlag = true;
     }
 
     /*

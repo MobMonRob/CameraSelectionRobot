@@ -229,6 +229,16 @@ public class WinAppCopy {
             closeApp(processName);
         }
     }
+    
+    /*
+    @dev: This method closes the Firewall pop up window by clicking the button on it
+    @param: None
+    @return: void
+    @author: Andres
+     */
+    protected void closeFirewallWindow() {
+        winDriver.findElementByName("Accept").click();
+    }
 
     /*
     @dev: it puts the subarea that contains the a given element in the correct position

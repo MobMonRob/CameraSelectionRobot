@@ -22,10 +22,12 @@ public class Tracker {
 
     // Class the contains the methods to controll automatically the Vicon Tracker
     WinAppController winAppController;
-
+    private boolean isFirstRequest;
+    
     // Constructor
     private Tracker() throws AWTException, IOException, MalformedURLException, InterruptedException {
         winAppController = new WinAppController();
+        isFirstRequest = true;
     }
 
     /*
@@ -88,8 +90,18 @@ public class Tracker {
         return response.toString();
     }
     
+    /*
+    @dev: This method closes the firewall window that appears with the first request
+          It closes it by clicking in the button (auxiliary method of WinAppController class)
+    @param: None
+    @returns: None
+    @author: Andres Masis
+    */
     private void closeFirewallPopup() {
-        winAppController.closeFirewall();
+        if(isFirstRequest){ // The pop up appears only the first time
+            winAppController.closeFirewall();
+            isFirstRequest = false;
+        }
     }
 
 
@@ -124,14 +136,14 @@ public class Tracker {
             ZMQ.Socket server = context.createSocket(SocketType.REP);
             server.bind("tcp://*:5555");  // address * to listen 
 
-            // Closes the firewall pop up window
-            t.closeFirewallPopup();
-
             // While(true) to keep the server listening
             while (true) {
                 // Gets the camera index from the client
                 byte[] cameraIndexData = server.recv();
                 int cameraIndex = java.nio.ByteBuffer.wrap(cameraIndexData).getInt();
+                                
+                // Closes the firewall pop up window
+                t.closeFirewallPopup();
 
                 // Checks if it is either the close app value or an index to interact with a camera
                 if (cameraIndex == 0) {
