@@ -281,9 +281,10 @@ You also have to add the following plugin the the pom file.
 When generating the .jar files in NetBeans with Clean and Build, none of the generated .jar files (the one of the server or the one of the client) could not find a main class. Even clicking on Build with Dependencies was not useful. To solve this, only use in the pom file the exact same plugin of the previous point.
 
 ### Java version not compatible 
-The computer of the lab runs with Java version 17.0.1. However, that version is already a bit old. So a .jar generated with a newer version of Java will not work in the computer of the lab. So, make sure that the .jar that ruins on the Server machine in the lab is built in the same coputer or a computer with Java version 17.0.1 or a bit older.
-,
--When this program starts, everything is alright. But as soon as the server machine receives the fist request, it awakes the Firew,--38all. The firewall sets a pop up window. This freezes the whole computer until the pop up is closed. To solve that, the fisrt request also activates a method to click on Accept on that pop up window.
+The computer of the lab runs with Java Runtime version 61.0. However, that version is already a bit old. So a .jar generated with a newer version of Java will not work in the computer of the lab. So, make sure that the .jar that ruins on the Server machine in the lab is built in the same coputer or a computer with Java version 61.0 or a bit older.
+
+### Firewall Pop up window
+When this program starts, everything is alright. But as soon as the server machine receives the fist request, it awakes the Firewall. The firewall sets a pop up window. This freezes the whole computer until the pop up is closed. To solve that, the fisrt request also activates a method to click on Accept on that pop up window.
 
 ## Possible problems
 This section describes problems that may appear during the execution of the program but have not been solved yet in the code. Since they have not been solved yet, a solution has to be implemented eventually. Also a possible solution is giving. This is just proposed and is not implemented yet. Since it is only a sugestion, feel free to follow another approach if you consider it better.
