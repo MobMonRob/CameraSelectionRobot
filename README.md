@@ -68,6 +68,7 @@ The current code already has the proper settings, but in case you want to modify
 - Make sure that both computers use the same port. Currently they use the port 5555.
 
 ## How to run
+This section explains how to run both programs in both computers, the server computer and the client computer.
 
 ### Server
 Run Server.jar
@@ -248,12 +249,31 @@ The first approach tried to find elements on the screen was image recognition. I
 When generating the .jar files in NetBeans with Clean and Build, none of the generated .jar files (the one of the server or the one of the client) could not find a main class. To solve that, in NetBeans go to the project and right click on it. Go to Properties->Run and there select the main class.
 You also have to add the following plugin the the pom file.
 ```xml
-      <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>14</maven.compiler.source>
-        <maven.compiler.target>14</maven.compiler.target>
-        <exec.mainClass>package.MainClass</exec.mainClass>
-    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>packageMainClass.MainClassName</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 ```
 - Remember there to specify also the name of the main class including its package.
 
