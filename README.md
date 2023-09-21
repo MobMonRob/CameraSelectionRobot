@@ -68,16 +68,36 @@ The current code already has the proper settings, but in case you want to modify
 - Make sure that both computers use the same port. Currently they use the port 5555.
 
 ## How to run
-This section explains how to run both programs in both computers, the server computer and the client computer.
+This section explains how to run both programs in both computers, the server computer and the client computer. The necessary jars are added in this repository. Those are CameraSelectionAPP.jar and CameraSelectionAPI.jar.
 
-### Server
-Run Server.jar
-Wait 30 seconds
-Do not touch it
+### Server Machine in the lab
+This uses CameraSelectionAPI.jar.
 
-### Client
-Run client.jar
-After 30 seconds and server must be on 
+1. **Run CameraSelectionAPI.jar:** Open the terminal and type the following command.
+
+   ```
+   java -jar locationCameraSelectionAPI.jar
+   ```
+   -- You can drag and drop the file into the the terminal to get the location
+2. **Wait 30 seconds:** Just with the previous step. The program is launched. But it is recommended to wait 30 seconds before sending request to make sure the Vicon Tracker had time to load.
+3. **Do not touch it:** Once the software is running, do not alter it. Avoid using the mouse or the keyboard meanwhile it is running to avoid interferences. If you need to interact with the software, do it from the client.
+
+### Client Remote machine
+This is the program you will use as user. This uses CameraSelectionAPP.jar.
+
+1. **Run CameraSelectionAPI.jar:** Open the terminal and type the following command.
+
+   ```
+   java -jar locationCameraSelectionAPP.jar
+   ```
+   -- You can drag and drop the file into the the terminal to get the location
+2. **Wait 30 seconds:** After the previous step, it should open the main menu in the terminal. It is recommended to send the first request 30 seconds after the server program has started.
+- **Enable/Disable a camera:** Send the number of camera you want to interact with (1 to 13). Then send 0 to disable that camera or 1 to enable it. After this, it will show you a success mesaage and take you again to the main menu.
+- **Check the status of all the cameras:** Send 14. Notice that this process will take a while. After it is completed, it will print a list with all the cameras and its status. Then it will take you back to the main menu.
+- **Close the program**: Send 0. It will print a closing message and finish the execution.
+
+During all the execution of the program, please read carefully all the instructions given in the terminal. 
+  
 
 ## Used tools (Libraries and Dependencies)
 
@@ -281,7 +301,7 @@ You also have to add the following plugin the the pom file.
 When generating the .jar files in NetBeans with Clean and Build, none of the generated .jar files (the one of the server or the one of the client) could not find a main class. Even clicking on Build with Dependencies was not useful. To solve this, only use in the pom file the exact same plugin of the previous point.
 
 ### Java version not compatible 
-The computer of the lab runs with Java Runtime version 61.0. However, that version is already a bit old. So a .jar generated with a newer version of Java will not work in the computer of the lab. So, make sure that the .jar that ruins on the Server machine in the lab is built in the same coputer or a computer with Java version 61.0 or a bit older.
+The computer of the lab runs with Java Runtime version 61.0. However, that version is already a bit old. So a .jar generated with a newer version of Java will not work in the computer of the lab. So, make sure that the .jar that ruins on the Server machine in the lab is built in the same coputer or a computer with Java version 61.0 or a bit older. With build. I do not only mean to click Build with dependenies in the computer of the lab. You have to create a complete new project in the computer of the lab, copy paste the code and Build with dependencies. If you bring the project from anotjer computer, it will keep the version of the other computer, even though you are building in the computer of the lab.
 
 ### Firewall Pop up window
 When this program starts, everything is alright. But as soon as the server machine receives the fist request, it awakes the Firewall. The firewall sets a pop up window. This freezes the whole computer until the pop up is closed. To solve that, the fisrt request also activates a method to click on Accept on that pop up window.
